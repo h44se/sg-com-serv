@@ -5,7 +5,7 @@ from management.system import SystemManager
 from management.docker import DockerManager
 from management.backup import BackupManager
 from management.maintenance import MaintenanceManager
-from management.utils import lint_markdown, fix_markdown_newlines
+from management.utils import lint_markdown, fix_markdown_newlines, setup_dotenv
 
 app = typer.Typer(help="CLI tools for server documentation and setup management.")
 
@@ -53,6 +53,7 @@ def setup_system(
     sys_mgr.setup_firewall(ports)
     sys_mgr.setup_auto_updates()
     sys_mgr.setup_fail2ban()
+    setup_dotenv()
     if not skip_docker:
         sys_mgr.setup_docker()
     typer.echo("Base system setup complete!")
@@ -148,6 +149,11 @@ def lint(
 def fix_newlines(directory: str = "."):
     """Fix trailing newlines in markdown files."""
     fix_markdown_newlines(directory)
+
+@app.command()
+def setup_env():
+    """Initialize .env file from .env.example."""
+    setup_dotenv()
 
 @app.command()
 def housekeep():

@@ -146,6 +146,7 @@ The following services are configured and documented in this repository:
 | **Dashboard** | Modern landing page for all services (Proxied). | 80, 443 | [View Guide](./docs/services/dashboard/dashboard.md) |
 | **Netdata** | Real-time infrastructure monitoring (Proxied). | 80, 443 | [View Guide](./docs/services/netdata/netdata.md) |
 | **Nginx Proxy** | Automated Reverse Proxy with SSL (Let's Encrypt). | 80, 443 | [View Guide](./docs/services/nginx/nginx.md) |
+| **ACME Companion** | Automated SSL Certificate management. | N/A | [View Guide](./docs/services/acme-companion/acme-companion.md) |
 | **TeamSpeak 3** | High-performance voice communication server. | 9987/udp, 10011/tcp, 30033/tcp | [View Guide](./docs/services/teamspeak3/teamspeak3.md) |
 
 ## Security and Maintenance
