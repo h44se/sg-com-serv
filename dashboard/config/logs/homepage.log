@@ -1,0 +1,29 @@
+[2026-02-22T21:07:27.191Z] info: kubernetes.yaml was copied to the config folder
+[2026-02-22T21:09:14.803Z] info: docker.yaml was copied to the config folder
+[2026-02-22T21:09:14.804Z] info: custom.css was copied to the config folder
+[2026-02-22T21:09:14.804Z] info: custom.js was copied to the config folder
+[2026-02-22T21:09:14.809Z] info: proxmox.yaml was copied to the config folder
+[2026-02-22T21:09:14.858Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:17.988Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:24.265Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:27.089Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:30.118Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:33.186Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:36.218Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:09:39.268Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:21.760Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:21.873Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:25.037Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:25.440Z] error: <httpProxy> Error calling http://netdata:19999/api/v1/info...
+[2026-02-22T21:25:25.443Z] error: <httpProxy> [
+  500,
+  [Error: queryAaaa ENOTFOUND netdata] {
+    errno: undefined,
+    code: 'ENOTFOUND',
+    syscall: 'queryAaaa',
+    hostname: 'netdata'
+  }
+]
+[2026-02-22T21:25:28.106Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:31.168Z] warn: <resources> Drive not found for target: /host/
+[2026-02-22T21:25:34.203Z] warn: <resources> Drive not found for target: /host/

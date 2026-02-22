@@ -1,0 +1,10 @@
+- resources:
+    cpu: true
+    memory: true
+    disk: /host/
+- datetime:
+    text_size: xl
+    format:
+      date: "DD MMM YYYY"
+      time: "HH:mm"
+      hour12: false

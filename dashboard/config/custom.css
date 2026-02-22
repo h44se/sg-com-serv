@@ -1,0 +1,199 @@
+.theme-gray {
+    /* DRACULA COLORS */
+    --dracula-background: #282a36;
+    --dracula-background-dark: #15161d;
+    --dracula-foreground: #44475a;
+    --dracula-text: #f8f8f2;
+    --dracula-slate: #6272a4;
+    --dracula-cyan: #8be9fd;
+    --dracula-green: #50fa7ae8;
+    --dracula-orange: #ffb86c;
+    --dracula-pink: #ff79c6;
+    --dracula-purple: #bd93f9;
+    --dracula-red: #ff5555;
+    --dracula-yellow: #f1fa8c;
+
+    /* Theme preset colors */
+    --color-50: 249 250 251;
+    --color-100: 243 244 246;
+    --color-200: 248 248 242;
+    /* Text Color - use Dracula text color */
+    --color-300: 209 213 219;
+    --color-400: 156 163 175;
+    --color-500: 107 114 128;
+    --color-600: 75 85 99;
+    --color-700: 55 65 81;
+    --color-800: 40 42 54;
+    /* Background color - use Dracula theme color */
+    --color-900: 21 22 29;
+    /* Dracula specific */
+    --color-logo-start: 156 163 175;
+    --color-logo-stop: 55 65 81;
+
+    --standard-bg: #44475a8e;
+
+    /* INFO WIDGET COLORS */
+    --info-widgets: var(--dracula-purple);
+    --resource-bar-bg: var(--standard-bg);
+    --resource-bar-fg: var(--dracula-green);
+
+    --widget-border: var(--dracula-foreground);
+
+    /* SERVICES COLORS */
+    --service-group: var(--dracula-purple);
+
+    --service-name: var(--dracula-text);
+    --service-description: var(--dracula-purple);
+
+    --service-block-bg: #232530;
+    --service-block-text: var(--dracula-pink);
+
+    /* BOOKMARKS COLORS */
+    --bookmark-group: var(--dracula-purple);
+
+    --bookmark-icon-bg: #44475a60;
+    --bookmark-icon: var(--dracula-purple);
+    --bookmark-name: var(--dracula-text);
+
+    /* ALL CARD COLORS */
+    --card-color: #44475a46;
+    --card-color-hover: #44475a91;
+
+    /* FOOTER COLORS */
+    --footer-items: var(--dracula-pink);
+
+    /* FOOTER COLORS */
+    --scrollbar-fg: var(--dracula-purple);
+    --scrollbar-bg: var(--standard-bg);
+
+    /*Class color values */
+    .service-tags .dark\:bg-theme-900\/50 {
+        background-color: rgb(var(--color-900) / 0.3) !important;
+    }
+
+    /*******************************
+  *  INFORMATION WIDGETS STYLES  *
+  *******************************/
+    #information-widgets {
+        border-color: var(--widget-border);
+    }
+
+    #information-widgets * {
+        color: var(--info-widgets);
+    }
+
+    .resource-usage {
+        background-color: var(--resource-bar-bg);
+    }
+
+    .resource-usage>div {
+        background-color: var(--resource-bar-fg);
+    }
+
+    /*******************************
+  *       SERVICES STYLES        *
+  *******************************/
+    .service-group-icon>div {
+        background: var(--service-group) !important;
+        /* group label ICON color */
+    }
+
+    .service-group-name {
+        color: var(--service-group);
+        /* group label NAME color */
+    }
+
+    .services-group>button>svg {
+        color: var(--service-group);
+        /* group label EXPAND/COLLAPSE ICON color */
+    }
+
+    .service-card {
+        background-color: var(--card-color);
+    }
+
+    .service-card:hover {
+        background-color: var(--card-color-hover);
+    }
+
+    .service-name.text-sm {
+        font-size: 0.95rem;
+        color: var(--service-name);
+    }
+
+    .service-description.text-xs {
+        font-size: 0.75rem;
+        color: var(--service-description);
+    }
+
+    .service img {
+        border-radius: 25%;
+    }
+
+    .service-block {
+        background: var(--service-block-bg);
+    }
+
+    .service-block .uppercase {
+        color: var(--service-block-text);
+    }
+
+    .service-block .font-thin {
+        color: var(--dracula-text);
+    }
+
+    /*******************************
+  *       BOOKMARK STYLES        *
+  *******************************/
+
+    .bookmark-group-name {
+        color: var(--bookmark-group);
+    }
+
+    .bookmark-icon {
+        background-color: var(--bookmark-icon-bg) !important;
+    }
+
+    .bookmark-icon>div>div {
+        background: var(--bookmark-icon) !important;
+        /* If using si or md icons, make default purple */
+    }
+
+    .bookmark-name.text-xs {
+        font-size: 0.85rem;
+        color: var(--bookmark-name);
+    }
+
+    li.bookmark>a {
+        background-color: var(--card-color);
+    }
+
+    li.bookmark>a:hover {
+        background-color: var(--card-color-hover);
+    }
+
+    /*******************************
+  *       CALENDAR STYLES        *
+  *******************************/
+
+    #dracula-calendar .flex.justify-between.flex-wrap span {
+        color: var(--dracula-purple);
+    }
+
+    /*******************************
+  *        FOOTER STYLES         *
+  *******************************/
+
+    #footer svg {
+        color: var(--footer-items);
+    }
+
+    /*******************************
+  *      SCROLLBAR STYLES        *
+  *******************************/
+
+    * {
+        --scrollbar-thumb: var(--scrollbar-fg);
+        --scrollbar-track: var(--scrollbar-bg);
+    }
+}

@@ -1,0 +1,15 @@
+filenames:
+  - /var/log/auth.log
+  - /var/log/syslog
+labels:
+  type: syslog
+---
+filenames:
+  - /var/log/nginx/*.log
+labels:
+  type: nginx
+---
+filenames:
+  - /var/log/teamspeak/*.log
+labels:
+  type: teamspeak

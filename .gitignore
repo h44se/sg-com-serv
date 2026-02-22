@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backups
+backups/
+*.tar.gz
+
+# Service Data (Personal/Secret)
+teamspeak/data/
+nginx/certs/
+nginx/vhost.d/
+nginx/html/
+
+# System
+.DS_Store
+Thumbs.db
+get-docker.sh

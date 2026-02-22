@@ -1,0 +1,26 @@
+- Infrastructure:
+    - Netdata:
+        icon: netdata.png
+        href: https://netdata.${DOMAIN_NAME}
+        description: Real-time monitoring
+        widget:
+          type: netdata
+          url: http://netdata:19999
+
+- Communication:
+    - TeamSpeak 3:
+        icon: teamspeak.png
+        href: ts3server://${DOMAIN_NAME}
+        description: Voice Server
+
+- Security & Proxy:
+    - Nginx Proxy:
+        icon: nginx-proxy.png
+        description: Reverse Proxy Management
+    - Fail2Ban:
+        icon: fail2ban.png
+        description: Intrusion Prevention
+    - CrowdSec:
+        icon: crowdsec.png
+        description: Community Threat Intel
+        href: https://crowdsec.net/
