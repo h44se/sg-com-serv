@@ -153,20 +153,41 @@ The following services are configured and documented in this repository:
 ### Reverse Proxy
 All web-facing services are behind an **Nginx Reverse Proxy** with automated SSL via **Let's Encrypt**. Direct access to service ports is restricted to the internal network where possible.
 
-### Backups
-Data persistence is handled via Docker volumes. Ensure you have a backup strategy for the `./teamspeak/data` and other critical directories. Recommended tool: `restic` or `borgbackup`.
+### Backups Workflow
+
+Data persistence is handled via Docker volumes and configuration files. To ensure your data is safe, use the built-in backup tools:
+
+1. **Create a Backup**:
+   ```bash
+   uv run tools.py backup-create
+   ```
+   This creates a timestamped archive in the `backups/` directory containing service data and configurations.
+
+2. **Restore from a Backup**:
+   ```bash
+   uv run tools.py backup-restore backups/backup_YYYYMMDD_HHMMSS.tar.gz
+   ```
+   *Note: Restoring will overwrite current data. The tool handles stopping and restarting services as needed.*
 
 ### Update Workflow
-To safely keep your system and services up to date:
 
+To safely keep your system and services up to date, you can use the automated housekeeping tool or follow the manual steps.
+
+#### Automated Maintenance (Recommended)
+Run the housekeeping routine to update the system, create a safety backup, check for container updates, and clean up Docker resources:
+```bash
+uv run tools.py housekeep
+```
+
+#### Manual Update Steps
 1. **Check for container updates**:
    ```bash
    uv run tools.py docker check-updates
    ```
-2. **Review the output**: Watchtower will tell you if a newer image exists for your pinned versions.
-3. **If you decide to update**:
-   - Update the version tag in `docker-compose.yml`.
-   - Run the update commands:
+2. **Review the output**: Watchtower will identify if newer images are available for your running containers.
+3. **Apply updates**:
+   - Update version tags in `docker-compose.yml` if you are pinning specific versions.
+   - Execute the update sequence:
      ```bash
      uv run tools.py system-update
      uv run tools.py docker pull
