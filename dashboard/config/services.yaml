@@ -3,6 +3,8 @@
         icon: netdata.png
         href: https://netdata.${DOMAIN_NAME}
         description: Real-time monitoring
+        server: local
+        container: netdata
         widget:
           type: netdata
           url: http://netdata:19999
@@ -12,11 +14,15 @@
         icon: teamspeak.png
         href: ts3server://${DOMAIN_NAME}
         description: Voice Server
+        server: local
+        container: teamspeak3
 
 - Security & Proxy:
     - Nginx Proxy:
         icon: nginx-proxy.png
         description: Reverse Proxy Management
+        server: local
+        container: nginx-proxy
     - Fail2Ban:
         icon: fail2ban.png
         description: Intrusion Prevention
@@ -24,3 +30,5 @@
         icon: crowdsec.png
         description: Community Threat Intel
         href: https://crowdsec.net/
+        server: local
+        container: crowdsec
