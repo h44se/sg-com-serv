@@ -14,6 +14,7 @@ Welcome to the documentation repository for our server infrastructure. This repo
 To get started with the server setup, follow these guides in order:
 1. [First Steps](./docs/setup/01-first-steps.md) - Initial server hardening and base installation.
 2. [Adding a New Service](./docs/setup/02-add-new-service.md) - How to extend this repository.
+3. [Basic Authentication](./docs/setup/03-security-auth.md) - Secure your dashboard and monitoring.
 
 ### Automated Setup
 
@@ -45,6 +46,7 @@ This repository includes a Python CLI for server management and documentation ma
 #### System Management
 - `setup-system`: Perform full base system setup and hardening.
 - `system-update`: Update system packages (apt update & upgrade).
+- `setup-env`: Initialize `.env` file from `.env.example`.
 - `housekeep`: Perform full system maintenance (Update, Backup, Check, Prune).
 
 #### Docker Service Management
@@ -55,6 +57,11 @@ This repository includes a Python CLI for server management and documentation ma
 - `docker status`: Show status of dockerized services.
 - `docker logs [service]`: View service logs.
 - `docker check-updates`: Check for available container updates (Monitor-only).
+- `docker test`: Validate docker-compose configuration (dry-run).
+
+#### Authentication Management
+- `auth add-user [username] --vhost [domain]`: Add or update a user for a specific virtual host.
+- `auth remove-user [username] --vhost [domain]`: Remove a user from a specific virtual host.
 
 #### Backup & Restore
 - `backup-create`: Create a full backup of services data and configuration.

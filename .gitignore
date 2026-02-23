@@ -28,6 +28,8 @@ nginx/logs/
 nginx/htpasswd/*
 !nginx/htpasswd/.htpasswd.example
 
+dashboard/config/logs/*
+
 # CrowdSec Runtime Data
 crowdsec/config/
 crowdsec/data/
