@@ -23,8 +23,7 @@ def list_services():
         ("Host", "SSH", "Secure Remote Access"),
         ("Docker", "Dashboard", "Central Services Landing Page"),
         ("Docker", "CrowdSec", "Community Threat Intelligence"),
-        ("Docker", "Nginx Proxy", "Automated Reverse Proxy & SSL"),
-        ("Docker", "ACME Companion", "SSL (Let's Encrypt) Automation"),
+        ("Docker", "Caddy", "Automated Reverse Proxy & SSL"),
         ("Docker", "TeamSpeak 3", "High-Performance Voice Server"),
         ("Docker", "Netdata", "Real-time System Monitoring"),
     ]

@@ -25,9 +25,24 @@ Example:
       - ./my-service/data:/data
     networks:
       - server_net
+
+## 2. Update Caddy Proxy
+
+To make the service accessible via HTTPS, add a site block to `caddy/Caddyfile`.
+
+Example:
+```caddy
+my-service.${DOMAIN_NAME} {
+    reverse_proxy my-new-service:8080
+}
 ```
 
-## 2. Update Firewall (UFW)
+Then reload Caddy:
+```bash
+docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+```
+
+## 3. Update Firewall (UFW)
 
 If the service needs to be accessible from the internet, you must open the required ports.
 
@@ -84,5 +99,5 @@ Finally, add the service to the table in the main `README.md`.
 Before considering the task "done", verify:
 - [ ] Is the service running as a non-root user inside the container?
 - [ ] Are sensitive ports restricted to specific IPs if possible?
-- [ ] Is there a need for SSL/TLS? (Consider adding a reverse proxy like Caddy).
+- [ ] Is there a need for SSL/TLS? (Configure in `caddy/Caddyfile`).
 - [ ] Is the data being backed up?

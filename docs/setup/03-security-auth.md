@@ -1,21 +1,21 @@
 # Security: Basic Authentication Setup
 
-This repository allows you to easily secure your web services (like the Dashboard and Netdata) using Nginx Basic Authentication.
+This repository allows you to easily secure your web services (like the Dashboard and Netdata) using Caddy Basic Authentication.
 
 ## Prerequisites
 
-- You must have the `apache2-utils` package installed to use the `htpasswd` command (or use an online generator).
+- You must have the `apache2-utils` package installed to use the `htpasswd` command (the CLI uses it to generate secure hashes).
   ```bash
   sudo apt install apache2-utils -y
   ```
 
 ## How to Enable Basic Auth
 
-To secure a service, you need to create a credential file named exactly after its `VIRTUAL_HOST` in the `nginx/htpasswd/` directory. You can do this manually or using the built-in CLI tools.
+To secure a service, you need to create an authentication snippet named exactly after its `VIRTUAL_HOST` in the `caddy/auth/` directory. You can do this using the built-in CLI tools.
 
 ### Using the CLI (Recommended)
 
-The repository includes a helper to manage users without needing to remember file paths:
+The repository includes a helper to manage users:
 
 ```bash
 # Add or update a user for the dashboard
@@ -30,44 +30,33 @@ uv run tools.py auth remove-user user1 --vhost netdata.example.com
 
 ### Manual Configuration
 
-If you prefer to do it manually:
+If you prefer to do it manually, create a file at `caddy/auth/your.vhost.com.caddy` with the following content:
 
-#### 1. Create your credentials
-
-You can generate a credential line using `htpasswd`:
-```bash
-# Output format: username:hashed_password
-htpasswd -nb admin yoursecretpassword
+```caddy
+basic_auth {
+    username hashed_password
+}
 ```
 
-### 2. Name the files correctly
+You can generate the `hashed_password` using `htpasswd -nbB user password` (the second part of the output) or using the `caddy hash-password` command inside the container.
 
-The files MUST match the `VIRTUAL_HOST` environment variable defined in `docker-compose.yml`.
+### Update domain names
 
-- **For the Dashboard**: `dashboard.yourserver.com`
-- **For Netdata**: `netdata.yourserver.com`
+The files MUST match the domain name defined in `caddy/Caddyfile`.
 
-If you want the SAME password for both, you can copy the same content into both files:
+- **For the Dashboard**: `dashboard.yourserver.com.caddy`
+- **For Netdata**: `netdata.yourserver.com.caddy`
 
-```bash
-# Create the directory if it doesn't exist
-mkdir -p nginx/htpasswd
+### Reload Caddy
 
-# Example for a server with DOMAIN_NAME=example.com
-echo "admin:HASHED_PASSWORD" > nginx/htpasswd/dashboard.example.com
-echo "admin:HASHED_PASSWORD" > nginx/htpasswd/netdata.example.com
-```
-
-### 3. Restart Services
-
-After adding or modifying files in `nginx/htpasswd/`, restart the proxy:
+After adding or modifying files in `caddy/auth/`, reload Caddy:
 
 ```bash
-uv run tools.py docker rebuild
+docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 ```
 
 ## Security Note
 
-- The `nginx/htpasswd/` directory is automatically excluded from Git to prevent leaking credentials.
+- The `caddy/auth/` directory is automatically excluded from Git to prevent leaking credentials.
 - The `tools.py` backup system **includes** this directory, so your credentials will be preserved in backups.
-- Ensure only the `nginx-proxy` and administrative users have access to these files.
+- Ensure only the `caddy` container and administrative users have access to these files.

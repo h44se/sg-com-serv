@@ -21,12 +21,7 @@ backups/
 # Service Data (Personal/Secret/Runtime)
 teamspeak/data/
 
-nginx/certs/
-nginx/vhost/
-nginx/html/
-nginx/logs/
-nginx/htpasswd/*
-!nginx/htpasswd/.htpasswd.example
+caddy/auth/*
 
 dashboard/config/logs/*
 

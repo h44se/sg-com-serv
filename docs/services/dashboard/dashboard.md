@@ -14,7 +14,7 @@ The dashboard is accessible via the automated reverse proxy.
 
 - **Image**: `ghcr.io/gethomepage/homepage:latest`
 - **Internal Port**: `3000`
-- **External Port**: `80 / 443` (via Nginx Proxy)
+- **External Port**: `80 / 443` (via Caddy)
 
 #### Environment Variables:
 - `VIRTUAL_HOST`: `dashboard.${DOMAIN_NAME}`
@@ -36,8 +36,8 @@ The dashboard is accessible via the automated reverse proxy.
 ### Netdata
 The dashboard includes a Netdata widget that communicates directly with the `netdata` service on the internal `server_net` network.
 
-### Nginx Proxy
-All SSL certificates and routing are handled automatically by the `nginx-proxy` and `acme-companion` services.
+### Caddy
+All SSL certificates and routing are handled automatically by `caddy` service.
 
 ## Usage
 

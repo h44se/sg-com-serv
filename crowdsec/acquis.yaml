@@ -5,9 +5,9 @@ labels:
   type: syslog
 ---
 filenames:
-  - /var/log/nginx/*.log
+  - /var/log/caddy/*.log
 labels:
-  type: nginx
+  type: caddy
 ---
 filenames:
   - /var/log/teamspeak/*.log

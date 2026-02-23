@@ -18,11 +18,11 @@
         container: teamspeak3
 
 - Security & Proxy:
-    - Nginx Proxy:
-        icon: nginx-proxy.png
+    - Caddy:
+        icon: caddy.png
         description: Reverse Proxy Management
         server: local
-        container: nginx-proxy
+        container: caddy
     - Fail2Ban:
         icon: fail2ban.png
         description: Intrusion Prevention

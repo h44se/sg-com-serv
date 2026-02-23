@@ -1,0 +1,33 @@
+{
+    # Global options
+    email {$LETSENCRYPT_EMAIL}
+}
+
+# Snippet for basic auth
+(auth_import) {
+    # This snippet imports a vhost-specific auth file if it exists
+    # If the file doesn't exist, it won't break Caddy as long as we handle it
+    # But Caddy's 'import' fails if the file is missing unless it's a glob that matches nothing
+}
+
+dashboard.{$DOMAIN_NAME} {
+    # Basic Auth - will be managed by tools.py
+    import auth/dashboard.{$DOMAIN_NAME}.caddy
+
+    reverse_proxy homepage:3000
+    
+    log {
+        output file /var/log/caddy/dashboard.access.log
+    }
+}
+
+netdata.{$DOMAIN_NAME} {
+    # Basic Auth - will be managed by tools.py
+    import auth/netdata.{$DOMAIN_NAME}.caddy
+
+    reverse_proxy netdata:19999
+    
+    log {
+        output file /var/log/caddy/netdata.access.log
+    }
+}

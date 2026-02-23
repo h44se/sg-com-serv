@@ -3,6 +3,7 @@ import typer
 
 class CommandRunner:
     @staticmethod
-    def run(cmd: str, check: bool = True):
+    def run(cmd: str, check: bool = True, capture: bool = False):
         typer.echo(f"Executing: {cmd}")
-        return subprocess.run(cmd, shell=True, check=check)
+        result = subprocess.run(cmd, shell=True, check=check, capture_output=capture, text=True)
+        return result.stdout if capture else result

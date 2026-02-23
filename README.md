@@ -112,8 +112,7 @@ graph TD
         F2B[Fail2Ban]
         
         subgraph "Docker Network (server_net)"
-            Proxy[Nginx Proxy]
-            ACME[ACME Companion]
+            Caddy[Caddy Proxy]
             TS3[TeamSpeak 3]
             ND[Netdata]
             Dash[Dashboard]
@@ -123,23 +122,22 @@ graph TD
 
     %% External Connections
     User -->|Port 22/tcp| SSH
-    User -->|Port 80, 443/tcp| Proxy
+    User -->|Port 80, 443/tcp| Caddy
     User -->|Port 9987/udp| TS3
     User -->|Port 10011, 30033/tcp| TS3
 
     %% Internal Interactions
-    Proxy <-->|SSL Certificates| ACME
-    Proxy -->|Reverse Proxy| ND
-    Proxy -->|Reverse Proxy| Dash
+    Caddy -->|Reverse Proxy| ND
+    Caddy -->|Reverse Proxy| Dash
     
     %% Security Layer
     F2B -.->|Monitors Logs & Bans| SSH
-    F2B -.->|Monitors Logs & Bans| Proxy
+    F2B -.->|Monitors Logs & Bans| Caddy
     CS -.->|Community Threat Intel| F2B
-    CS -.->|Monitors Logs| Proxy
+    CS -.->|Monitors Logs| Caddy
 
     style F2B fill:#f96,stroke:#333,stroke-width:2px
-    style Proxy fill:#69f,stroke:#333,stroke-width:2px
+    style Caddy fill:#69f,stroke:#333,stroke-width:2px
     style User fill:#fff,stroke:#333,stroke-width:2px
 ```
 
@@ -153,14 +151,13 @@ The following services are configured and documented in this repository:
 | **CrowdSec** | Collaborative threat intelligence and behavioral security. | N/A | [View Guide](./docs/services/crowdsec/crowdsec.md) |
 | **Dashboard** | Modern landing page for all services (Proxied). | 80, 443 | [View Guide](./docs/services/dashboard/dashboard.md) |
 | **Netdata** | Real-time infrastructure monitoring (Proxied). | 80, 443 | [View Guide](./docs/services/netdata/netdata.md) |
-| **Nginx Proxy** | Automated Reverse Proxy with SSL (Let's Encrypt). | 80, 443 | [View Guide](./docs/services/nginx/nginx.md) |
-| **ACME Companion** | Automated SSL Certificate management. | N/A | [View Guide](./docs/services/acme-companion/acme-companion.md) |
+| **Caddy** | Automated Reverse Proxy with built-in SSL (Let's Encrypt). | 80, 443 | [View Guide](./docs/services/caddy/caddy.md) |
 | **TeamSpeak 3** | High-performance voice communication server. | 9987/udp, 10011/tcp, 30033/tcp | [View Guide](./docs/services/teamspeak3/teamspeak3.md) |
 
 ## Security and Maintenance
 
 ### Reverse Proxy
-All web-facing services are behind an **Nginx Reverse Proxy** with automated SSL via **Let's Encrypt**. Direct access to service ports is restricted to the internal network where possible.
+All web-facing services are behind a **Caddy Reverse Proxy** with automated SSL via **Let's Encrypt**. Direct access to service ports is restricted to the internal network where possible.
 
 ### Backups Workflow
 
