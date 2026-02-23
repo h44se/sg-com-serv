@@ -42,3 +42,7 @@ class DockerManager:
         # Run watchtower in run-once, monitor-only mode
         cmd = "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once --monitor-only"
         CommandRunner.run(cmd)
+
+    def test(self):
+        typer.echo("Validating docker-compose configuration (dry-run)...")
+        CommandRunner.run("docker compose up --dry-run")

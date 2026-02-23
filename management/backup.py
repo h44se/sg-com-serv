@@ -24,7 +24,7 @@ class BackupManager:
         CommandRunner.run("docker compose down", check=False)
 
         # Backup files/directories
-        items_to_copy = [".env", "docker-compose.yml", "teamspeak", "nginx"]
+        items_to_copy = [".env", "docker-compose.yml", "teamspeak", "nginx", "crowdsec"]
         for item in items_to_copy:
             src = os.path.join(self.repo_dir, item)
             if os.path.exists(src):
@@ -79,7 +79,7 @@ class BackupManager:
         content_dir = os.path.join(tmp_extract_dir, extracted_content[0])
 
         # Restore files/directories
-        items_to_restore = [".env", "docker-compose.yml", "teamspeak", "nginx"]
+        items_to_restore = [".env", "docker-compose.yml", "teamspeak", "nginx", "crowdsec"]
         for item in items_to_restore:
             src = os.path.join(content_dir, item)
             dst = os.path.join(self.repo_dir, item)

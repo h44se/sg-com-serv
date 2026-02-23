@@ -122,6 +122,13 @@ def check_updates():
     """
     DockerManager().check_updates()
 
+@docker_app.command()
+def test():
+    """
+    Validate docker-compose configuration using dry-run.
+    """
+    DockerManager().test()
+
 @app.command()
 def backup_create(
     directory: str = typer.Option("backups", "--dir", "-d", help="Directory to store the backup.")
@@ -161,6 +168,28 @@ def housekeep():
     Perform a complete housekeeping routine: update system, backup data, check for updates, and prune Docker.
     """
     MaintenanceManager().housekeep()
+    
+auth_app = typer.Typer(help="User authentication management.")
+app.add_typer(auth_app, name="auth")
+
+@auth_app.command()
+def add_user(
+    username: str = typer.Argument(..., help="The username to add/update."),
+    vhost: str = typer.Option(..., "--vhost", "-v", help="The VIRTUAL_HOST to secure (e.g., dashboard.example.com)."),
+    password: str = typer.Option(None, "--password", "-p", help="The password for the user (prompted if omitted).")
+):
+    """Add or update a user for a specific virtual host."""
+    from management.security import SecurityManager
+    SecurityManager().manage_user(username, vhost, password=password)
+
+@auth_app.command()
+def remove_user(
+    username: str = typer.Argument(..., help="The username to remove."),
+    vhost: str = typer.Option(..., "--vhost", "-v", help="The VIRTUAL_HOST (e.g., dashboard.example.com).")
+):
+    """Remove a user from a specific virtual host."""
+    from management.security import SecurityManager
+    SecurityManager().manage_user(username, vhost, remove=True)
 
 if __name__ == "__main__":
     app()

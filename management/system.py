@@ -9,6 +9,7 @@ class SystemManager:
     def update(self):
         typer.echo("Updating system packages...")
         CommandRunner.run("sudo apt update && sudo apt upgrade -y")
+        CommandRunner.run("sudo apt install apache2-utils -y")
 
     def harden_ssh(self):
         typer.echo("Hardening SSH configuration...")

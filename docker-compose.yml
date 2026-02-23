@@ -86,6 +86,7 @@ services:
       - ./nginx/vhost:/etc/nginx/vhost.d
       - ./nginx/html:/usr/share/nginx/html
       - ./nginx/logs:/var/log/nginx
+      - ./nginx/htpasswd:/etc/nginx/htpasswd:ro
     networks:
       - server_net
     healthcheck:
@@ -127,6 +128,8 @@ services:
         max-file: "3"
 
   homepage:
+    ports:
+      - "3000:3000"
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped
@@ -152,7 +155,7 @@ services:
         max-file: "3"
 
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.6
+    image: crowdsecurity/crowdsec:v1.7.6
     container_name: crowdsec
     restart: unless-stopped
     environment:
