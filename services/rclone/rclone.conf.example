@@ -1,0 +1,16 @@
+# Rclone Configuration Example
+# You should run 'rclone config' locally to generate your own credentials,
+# then copy the relevant sections here.
+
+# [remote]
+# type = drive
+# scope = drive
+# token = {"access_token":"...","token_type":"Bearer","refresh_token":"...","expiry":"..."}
+# team_drive = 
+
+# [backup-crypt]
+# type = crypt
+# remote = remote:backups
+# filename_encryption = standard
+# directory_name_encryption = true
+# password = YOUR_SF_ENCRYPTED_PASSWORD

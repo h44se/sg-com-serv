@@ -155,7 +155,15 @@ We use `uv` for managing Python tooling:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-## 9. Clone this Repository
+## 9. Install Rclone (for Cloud Backups)
+
+To manage external backups, install Rclone on the host:
+
+```bash
+sudo -v && curl https://rclone.org/install.sh | sudo bash
+```
+
+## 10. Clone this Repository
 
 Clone the documentation and configuration repository:
 
@@ -164,7 +172,7 @@ git clone <this-repo-url> ~/server-config
 cd ~/server-config
 ```
 
-## 10. Configure Environment Variables
+## 11. Configure Environment Variables
 
 Some services use environment variables. Create a `.env` file from the example:
 
@@ -172,7 +180,7 @@ Some services use environment variables. Create a `.env` file from the example:
 uv run tools.py setup-env
 ```
 
-## 11. Next Steps
+## 12. Next Steps
 
 Once your base system is set up, you can:
 - [Add a new service](./02-add-new-service.md) to the server.

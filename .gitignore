@@ -29,6 +29,9 @@ services/dashboard/config/logs/*
 services/crowdsec/config/
 services/crowdsec/data/
 
+# Rclone Configuration
+services/rclone/rclone.conf
+
 # System
 .DS_Store
 Thumbs.db

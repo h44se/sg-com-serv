@@ -4,6 +4,7 @@ from typing import List
 from management.system import SystemManager
 from management.docker import DockerManager
 from management.backup import BackupManager
+from management.rclone import RCloneManager
 from management.maintenance import MaintenanceManager
 from management.utils import lint_markdown, fix_markdown_newlines, setup_dotenv
 
@@ -142,6 +143,27 @@ def backup_restore(
 ):
     """Restore services data and configuration from a backup archive."""
     BackupManager(backup_dir=directory).restore(archive)
+
+@app.command()
+def backup_upload(
+    remote: str = typer.Option("remote:backup", "--remote", "-r", help="Rclone remote name and path."),
+    config: str = typer.Option("services/rclone/rclone.conf", "--config", "-c", help="Path to rclone config.")
+):
+    """Upload existing backups to cloud storage and rotate old files."""
+    RCloneManager(config_path=config).upload(remote=remote)
+
+@app.command()
+def backup_download(
+    remote: str = typer.Option("remote:backup", "--remote", "-r", help="Rclone remote name and path."),
+    config: str = typer.Option("services/rclone/rclone.conf", "--config", "-c", help="Path to rclone config.")
+):
+    """Download backups from cloud storage."""
+    RCloneManager(config_path=config).download(remote=remote)
+
+@app.command()
+def setup_backup_cron():
+    """Add a daily cronjob to the host for automated backups and cloud upload."""
+    RCloneManager().setup_cron()
 
 @app.command()
 def lint(
