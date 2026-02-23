@@ -12,7 +12,7 @@ services:
     environment:
       - TS3SERVER_LICENSE=${TS3SERVER_LICENSE:-accept}
     volumes:
-      - ./teamspeak/data:/var/ts3server
+      - ./services/teamspeak/data:/var/ts3server
     networks:
       - server_net
     deploy:
@@ -76,11 +76,11 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./caddy/data:/data
-      - ./caddy/config:/config
-      - ./caddy/auth:/etc/caddy/auth:ro
-      - ./caddy/logs:/var/log/caddy
+      - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./services/caddy/data:/data
+      - ./services/caddy/config:/config
+      - ./services/caddy/auth:/etc/caddy/auth:ro
+      - ./services/caddy/logs:/var/log/caddy
     networks:
       - server_net
     healthcheck:
@@ -101,7 +101,7 @@ services:
     container_name: homepage
     restart: unless-stopped
     volumes:
-      - ./dashboard/config:/app/config
+      - ./services/dashboard/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - server_net
@@ -123,11 +123,11 @@ services:
     environment:
       - COLLECTIONS=${CROWDSEC_COLLECTIONS}
     volumes:
-      - ./crowdsec/config:/etc/crowdsec
-      - ./crowdsec/data:/var/lib/crowdsec/data
+      - ./services/crowdsec/config:/etc/crowdsec
+      - ./services/crowdsec/data:/var/lib/crowdsec/data
       - /var/log:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./caddy/logs:/var/log/caddy:ro
+      - ./services/caddy/logs:/var/log/caddy:ro
     networks:
       - server_net
     healthcheck:

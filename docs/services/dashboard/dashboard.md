@@ -24,7 +24,7 @@ The dashboard is accessible via the automated reverse proxy.
 
 ### Volumes
 
-- `./dashboard/config`: Contains YAML configuration files.
+- `./services/dashboard/config`: Contains YAML configuration files.
   - `services.yaml`: List of services and categories.
   - `widgets.yaml`: Dashboard widgets (CPU, Memory, etc.).
   - `settings.yaml`: Visual settings and theme.
@@ -42,7 +42,7 @@ All SSL certificates and routing are handled automatically by `caddy` service.
 ## Usage
 
 ### Adding Services
-To add a new service to the dashboard, edit `dashboard/config/services.yaml`. Example:
+To add a new service to the dashboard, edit `services/dashboard/config/services.yaml`. Example:
 
 ```yaml
 - Category Name:

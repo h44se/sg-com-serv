@@ -28,7 +28,7 @@ Example:
 
 ## 2. Update Caddy Proxy
 
-To make the service accessible via HTTPS, add a site block to `caddy/Caddyfile`.
+To make the service accessible via HTTPS, add a site block to `services/caddy/Caddyfile`.
 
 Example:
 ```caddy
@@ -80,8 +80,8 @@ Every service must have its own documentation file in `docs/services/<service-na
 
 To make the service visible on the central landing page:
 
-1.  **Update `dashboard/config/services.yaml`**: Add the service under the appropriate category.
-2.  **Add an Icon**: Ensure the icon is referenced correctly or added to `dashboard/config/icons/`.
+1.  **Update `services/dashboard/config/services.yaml`**: Add the service under the appropriate category.
+2.  **Add an Icon**: Ensure the icon is referenced correctly or added to `services/dashboard/config/icons/`.
 
 Example:
 ```yaml
@@ -99,5 +99,5 @@ Finally, add the service to the table in the main `README.md`.
 Before considering the task "done", verify:
 - [ ] Is the service running as a non-root user inside the container?
 - [ ] Are sensitive ports restricted to specific IPs if possible?
-- [ ] Is there a need for SSL/TLS? (Configure in `caddy/Caddyfile`).
+- [ ] Is there a need for SSL/TLS? (Configure in `services/caddy/Caddyfile`).
 - [ ] Is the data being backed up?

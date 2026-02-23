@@ -11,7 +11,7 @@ This repository allows you to easily secure your web services (like the Dashboar
 
 ## How to Enable Basic Auth
 
-To secure a service, you need to create an authentication snippet named exactly after its `VIRTUAL_HOST` in the `caddy/auth/` directory. You can do this using the built-in CLI tools.
+To secure a service, you need to create an authentication snippet named exactly after its `VIRTUAL_HOST` in the `services/caddy/auth/` directory. You can do this using the built-in CLI tools.
 
 ### Using the CLI (Recommended)
 
@@ -30,7 +30,7 @@ uv run tools.py auth remove-user user1 --vhost netdata.example.com
 
 ### Manual Configuration
 
-If you prefer to do it manually, create a file at `caddy/auth/your.vhost.com.caddy` with the following content:
+If you prefer to do it manually, create a file at `services/caddy/auth/your.vhost.com.caddy` with the following content:
 
 ```caddy
 basic_auth {
@@ -42,14 +42,14 @@ You can generate the `hashed_password` using `htpasswd -nbB user password` (the 
 
 ### Update domain names
 
-The files MUST match the domain name defined in `caddy/Caddyfile`.
+The files MUST match the domain name defined in `services/caddy/Caddyfile`.
 
 - **For the Dashboard**: `dashboard.yourserver.com.caddy`
 - **For Netdata**: `netdata.yourserver.com.caddy`
 
 ### Reload Caddy
 
-After adding or modifying files in `caddy/auth/`, reload Caddy:
+After adding or modifying files in `services/caddy/auth/`, reload Caddy:
 
 ```bash
 docker exec caddy caddy reload --config /etc/caddy/Caddyfile
@@ -57,6 +57,6 @@ docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 
 ## Security Note
 
-- The `caddy/auth/` directory is automatically excluded from Git to prevent leaking credentials.
+- The `services/caddy/auth/` directory is automatically excluded from Git to prevent leaking credentials.
 - The `tools.py` backup system **includes** this directory, so your credentials will be preserved in backups.
 - Ensure only the `caddy` container and administrative users have access to these files.

@@ -18,9 +18,9 @@ Unlike Fail2Ban which relies solely on local logs, CrowdSec shares "signals" wit
 
 ### Volumes
 
-- `./crowdsec/config`: Main configuration files.
+- `./services/crowdsec/config`: Main configuration files.
   - `acquis.yaml`: Defines which logs CrowdSec should monitor.
-- `./crowdsec/data`: Persistent database for local signals.
+- `./services/crowdsec/data`: Persistent database for local signals.
 - `/var/log`: Mounted as **read-only** to allow the container to analyze system and service logs.
 
 ## Integrations

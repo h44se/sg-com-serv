@@ -19,15 +19,15 @@ backups/
 *.tar.gz
 
 # Service Data (Personal/Secret/Runtime)
-teamspeak/data/
+services/teamspeak/data/
 
-caddy/auth/*
+services/caddy/auth/*
 
-dashboard/config/logs/*
+services/dashboard/config/logs/*
 
 # CrowdSec Runtime Data
-crowdsec/config/
-crowdsec/data/
+services/crowdsec/config/
+services/crowdsec/data/
 
 # System
 .DS_Store

@@ -19,7 +19,7 @@ Environment variables:
 ### Data Persistence
 
 Configuration and database files are stored in:
-- `./teamspeak/data/` (Mapped to `/var/ts3server/` in the container).
+- `./services/teamspeak/data/` (Mapped to `/var/ts3server/` in the container).
 
 ## Fail2Ban Integration
 
@@ -42,7 +42,7 @@ Add to `/etc/fail2ban/jail.local`:
 enabled  = true
 port     = 10011
 filter   = teamspeak
-logpath  = ~/server-config/teamspeak/data/logs/ts3server_*.log
+logpath  = ~/server-config/services/teamspeak/data/logs/ts3server_*.log
 maxretry = 5
 bantime  = 1h
 ```

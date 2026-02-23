@@ -54,7 +54,7 @@ class SystemManager:
         CommandRunner.run(f"echo -e '{filter_content}' | sudo tee /etc/fail2ban/filter.d/teamspeak.conf > /dev/null")
         
         base_path = os.path.expanduser("~/server-config")
-        log_dir = os.path.join(base_path, "teamspeak/data/logs")
+        log_dir = os.path.join(base_path, "services/teamspeak/data/logs")
         CommandRunner.run(f"mkdir -p {log_dir}")
         
         log_path = os.path.join(log_dir, "ts3server_*.log")

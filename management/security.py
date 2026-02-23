@@ -5,7 +5,7 @@ from .runner import CommandRunner
 class SecurityManager:
     """Manages service security and authentication."""
     
-    def __init__(self, auth_dir: str = "caddy/auth"):
+    def __init__(self, auth_dir: str = "services/caddy/auth"):
         self.auth_dir = os.path.abspath(auth_dir)
         if not os.path.exists(self.auth_dir):
             os.makedirs(self.auth_dir)

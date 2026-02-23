@@ -16,7 +16,7 @@ The proxy is configured to listen on ports `80` (HTTP) and `443` (HTTPS).
 
 To put a service behind the proxy:
 1.  Ensure the service is on the `server_net` network.
-2.  Add a site block to `./caddy/Caddyfile`.
+2.  Add a site block to `./services/caddy/Caddyfile`.
 
 Example Site Block:
 ```caddy
@@ -27,18 +27,18 @@ myservice.{$DOMAIN_NAME} {
 
 ### Volumes
 
-- `./caddy/Caddyfile`: The main configuration file.
-- `./caddy/data`: Persistent storage for SSL certificates and Caddy state.
-- `./caddy/config`: Caddy configuration storage.
-- `./caddy/auth`: Directory for basic authentication snippets.
-- `./caddy/logs`: Access logs.
+- `./services/caddy/Caddyfile`: The main configuration file.
+- `./services/caddy/data`: Persistent storage for SSL certificates and Caddy state.
+- `./services/caddy/config`: Caddy configuration storage.
+- `./services/caddy/auth`: Directory for basic authentication snippets.
+- `./services/caddy/logs`: Access logs.
 
 ## Usage
 
 ### Adding a Service
 
 1. Update your `.env` file with `DOMAIN_NAME` and `LETSENCRYPT_EMAIL`.
-2. Update the `caddy/Caddyfile` with the new service details.
+2. Update the `services/caddy/Caddyfile` with the new service details.
 3. Reload Caddy:
    ```bash
    docker exec caddy caddy reload --config /etc/caddy/Caddyfile
