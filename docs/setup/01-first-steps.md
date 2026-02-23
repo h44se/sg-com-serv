@@ -169,8 +169,7 @@ cd ~/server-config
 Some services use environment variables. Create a `.env` file from the example:
 
 ```bash
-cp .env.example .env
-nano .env
+uv run tools.py setup-env
 ```
 
 ## 11. Next Steps

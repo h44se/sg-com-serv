@@ -6,6 +6,7 @@ Welcome to the documentation repository for our server infrastructure. This repo
 
 - `docs/setup/`: System setup and service addition guides.
 - `docs/services/`: Documentation for available services and their configurations.
+- `management/`: Python classes for system and service management.
 - `docker-compose.yml`: Main configuration to bring up all dockerized services.
 - `tools.py`: Tooling and helper scripts for automation.
 
