@@ -18,11 +18,19 @@ __pycache__/
 backups/
 *.tar.gz
 
-# Service Data (Personal/Secret)
+# Service Data (Personal/Secret/Runtime)
 teamspeak/data/
+
 nginx/certs/
-nginx/vhost.d/
+nginx/vhost/
 nginx/html/
+nginx/logs/
+nginx/htpasswd/*
+!nginx/htpasswd/.htpasswd.example
+
+# CrowdSec Runtime Data
+crowdsec/config/
+crowdsec/data/
 
 # System
 .DS_Store
