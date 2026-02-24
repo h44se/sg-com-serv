@@ -16,6 +16,15 @@
         description: Voice Server
         server: local
         container: teamspeak3
+        widget:
+          type: customapi
+          url: http://tswatch:5000/status
+          refreshInterval: 10000
+          mappings:
+            - label: Users
+              value: users
+            - label: Max
+              value: max_users
 
 - Security & Proxy:
     - Caddy:

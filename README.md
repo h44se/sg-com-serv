@@ -126,6 +126,7 @@ graph TD
             ND[Netdata]
             Dash[Dashboard]
             CS[CrowdSec]
+            TSW[TSWatch]
         end
     end
 
@@ -138,6 +139,8 @@ graph TD
     %% Internal Interactions
     Caddy -->|Reverse Proxy| ND
     Caddy -->|Reverse Proxy| Dash
+    Dash -->|Fetches Metrics| TSW
+    TSW -->|Queries| TS3
     
     %% Security Layer
     F2B -.->|Monitors Logs & Bans| SSH
@@ -162,6 +165,7 @@ The following services are configured and documented in this repository:
 | **Netdata** | Real-time infrastructure monitoring (Proxied). | 80, 443 | [View Guide](./docs/services/netdata/netdata.md) |
 | **Caddy** | Automated Reverse Proxy with built-in SSL (Let's Encrypt). | 80, 443 | [View Guide](./docs/services/caddy/caddy.md) |
 | **TeamSpeak 3** | High-performance voice communication server. | 9987/udp, 10011/tcp, 30033/tcp | [View Guide](./docs/services/teamspeak3/teamspeak3.md) |
+| **TSWatch** | Metrics helper for TeamSpeak 3 Dashboard integration. | N/A | [View Guide](./docs/services/tswatch/tswatch.md) |
 | **Rclone** | Cloud backup synchronization and encryption. | N/A | [View Guide](./docs/services/rclone/rclone.md) |
 
 ## Security and Maintenance

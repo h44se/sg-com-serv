@@ -30,6 +30,26 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  tswatch:
+    build: ./services/tswatch
+    container_name: tswatch
+    restart: unless-stopped
+    environment:
+      - TS3_QUERY_USER=${TS3_QUERY_USER}
+      - TS3_QUERY_PASSWORD=${TS3_QUERY_PASSWORD}
+      - TS3_QUERY_IP=${TS3_QUERY_IP}
+      - TS3_QUERY_PORT=${TS3_QUERY_PORT}
+      - TS3_SERVER_ID=${TS3_SERVER_ID:-1}
+    networks:
+      - server_net
+    depends_on:
+      - teamspeak3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   netdata:
     image: netdata/netdata:v2.9
     container_name: netdata
