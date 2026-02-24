@@ -5,7 +5,7 @@ labels:
   type: syslog
 ---
 filenames:
-  - /var/log/caddy/*.log
+  - /caddy/*.log
 labels:
   type: caddy
 ---
