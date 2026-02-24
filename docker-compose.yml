@@ -94,11 +94,9 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  homepage:
-    ports:
-      - "3000:3000"
+  dashboard:
     image: ghcr.io/gethomepage/homepage:latest
-    container_name: homepage
+    container_name: dashboard
     restart: unless-stopped
     volumes:
       - ./services/dashboard/config:/app/config
