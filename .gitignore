@@ -22,11 +22,13 @@ backups/
 services/teamspeak/data/
 
 services/caddy/auth/*
+services/caddy/logs/*
 
 services/dashboard/config/logs/*
 
 # CrowdSec Runtime Data
 services/crowdsec/config/
+!services/crowdsec/config/acquis.yaml
 services/crowdsec/data/
 
 # Rclone Configuration
