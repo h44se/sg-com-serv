@@ -106,7 +106,7 @@ services:
     environment:
       HOMEPAGE_ALLOWED_HOSTS: dashboard.${DOMAIN_NAME:-localhost}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (res) => { if (res.statusCode === 200) process.exit(0); else process.exit(1); }).on('error', () => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
