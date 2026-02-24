@@ -19,12 +19,17 @@
         widget:
           type: customapi
           url: http://tswatch:5000/status
-          refreshInterval: 10000
+          refreshInterval: 60000
           mappings:
-            - label: Users
-              value: users
-            - label: Max
-              value: max_users
+            - field: status
+              label: Status
+              format: status
+            - field: users
+              label: Online
+              format: number
+            - field: max_users
+              label: Slot-Limit
+              format: number
 
 - Security & Proxy:
     - Caddy:

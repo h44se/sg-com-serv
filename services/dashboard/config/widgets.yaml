@@ -1,7 +1,6 @@
 - resources:
     cpu: true
     memory: true
-    disk: /host/
 - datetime:
     text_size: xl
     format:
