@@ -71,6 +71,7 @@ services:
       - /etc/os-release:/host/etc/os-release:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/log:/host/var/log:ro
+      - ./services/favicon/favicon.ico:/usr/share/netdata/web/favicon.ico:ro
     networks:
       - server_net
     deploy:
@@ -120,6 +121,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./services/dashboard/config:/app/config
+      - ./services/favicon/:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - server_net

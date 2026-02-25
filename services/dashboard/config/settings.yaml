@@ -7,4 +7,4 @@ background:
 cardBlur: 10
 color: gray
 hideHostname: true
-footerText: "Server Documentation Infrastructure"
+favicon: /images/favicon.ico
