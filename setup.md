@@ -100,25 +100,25 @@ docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 
 ### 6.2. Enable Automated Cloud Backups
 
-To ensure your data is safe, configure Rclone for cloud backups.
+Rclone runs as a Docker container, so no host-side installation is required.
 
-1. **Install Rclone**:
-
-    ```bash
-    sudo -v && curl https://rclone.org/install.sh | sudo bash
-    ```
-
-2. **Configure Remote**:
+1. **Build the rclone image**:
 
     ```bash
-    rclone config
-    # Follow the prompts to add your cloud provider (e.g., Google Drive)
-    # Move the config to the project:
-    mkdir -p services/rclone
-    cp ~/.config/rclone/rclone.conf services/rclone/rclone.conf
+    docker compose --profile backup build rclone
     ```
 
-3. **Setup Daily Cronjob**:
+2. **Configure your cloud remote** (interactive wizard runs inside the container):
+
+    ```bash
+    uv run tools.py backup-config
+    ```
+
+    The config is saved to `services/rclone/config/rclone.conf`.
+    See `docs/services/rclone/rclone.md` for full configuration details including
+    optional client-side encryption.
+
+3. **Setup daily root crontab**:
 
     ```bash
     uv run tools.py setup-backup-cron

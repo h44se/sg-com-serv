@@ -165,6 +165,29 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # ──────────────────────────────────────────────────────────────────
+  # rclone — one-off backup container.
+  # Does NOT start with `docker compose up`. Invoke via:
+  #   docker compose run --rm rclone <args>
+  # or through: uv run tools.py backup-upload / backup-download
+  # Runs as root (uid 0:0) so it can read every volume regardless of
+  # the owning user set by other containers.
+  # ──────────────────────────────────────────────────────────────────
+  rclone:
+    build: ./services/rclone
+    container_name: rclone
+    user: "0:0"
+    profiles:
+      - backup
+    volumes:
+      - ./services/rclone/config:/config/rclone
+      - ./backups:/backups
+      - ./services:/services:ro
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+    networks:
+      - server_net
+
 networks:
   server_net:
     driver: bridge

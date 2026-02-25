@@ -2,79 +2,94 @@ import os
 import typer
 from .runner import CommandRunner
 
+
 class RCloneManager:
-    """Manages cloud backups using rclone."""
+    """Manages cloud backups using the rclone Docker container."""
 
-    def __init__(self, config_path: str = "services/rclone/rclone.conf"):
-        self.config_path = os.path.abspath(config_path)
+    def __init__(self):
         self.backup_dir = os.path.abspath("backups")
-        
-    def _check_installed(self):
-        try:
-            CommandRunner.run("rclone version", capture=True)
-            return True
-        except Exception:
-            typer.secho("Error: rclone is not installed on the host system.", fg=typer.colors.RED)
-            typer.echo("Follow the setup guide: docs/setup/01-first-steps.md")
-            return False
+        # Config is volume-mounted into the container at /config/rclone
+        # so rclone picks it up automatically — no --config flag needed.
 
-    def upload(self, remote: str = "remote:backup"):
-        if not self._check_installed():
-            return
-
-        typer.echo(f"Uploading backups to {remote}...")
-        # Use --config to specify our local config path
-        cmd = f"rclone --config {self.config_path} copy {self.backup_dir} {remote} --progress"
+    def _run(self, *args: str):
+        """Run an rclone command inside the Docker container."""
+        joined = " ".join(args)
+        cmd = f"docker compose --profile backup run --rm rclone {joined}"
         CommandRunner.run(cmd)
-        
-        # Auto-rotation: Delete files older than 2 weeks on the remote
-        typer.echo("Cleaning up old backups on remote (older than 14 days)...")
-        cleanup_cmd = f"rclone --config {self.config_path} delete {remote} --min-age 14d"
-        CommandRunner.run(cleanup_cmd)
-        typer.secho("✅ Upload and rotation complete.", fg=typer.colors.GREEN)
 
-    def download(self, remote: str = "remote:backup"):
-        if not self._check_installed():
-            return
-
-        typer.echo(f"Downloading backups from {remote}...")
+    def _ensure_backup_dir(self):
         if not os.path.exists(self.backup_dir):
             os.makedirs(self.backup_dir)
-            
-        cmd = f"rclone --config {self.config_path} copy {remote} {self.backup_dir} --progress"
-        CommandRunner.run(cmd)
-        typer.secho("✅ Download complete.", fg=typer.colors.GREEN)
 
-    def setup_cron(self):
-        """Adds a cronjob for daily backup and upload."""
-        # We assume the user wants to run 'tools.py backup-create' and then 'tools.py backup-upload'
-        script_path = os.path.abspath("tools.py")
+    def upload(self, remote: str = "remote:backup"):
+        """Upload the local backups/ directory to a remote and rotate old files."""
+        typer.echo(f"📤  Uploading backups to {remote} via Docker container...")
+        # Inside the container ./backups is mounted at /backups
+        self._run("copy", "/backups", remote, "--progress")
+
+        typer.echo("🗑️   Cleaning up remote files older than 14 days...")
+        self._run("delete", remote, "--min-age", "14d")
+
+        typer.secho("✅  Upload and rotation complete.", fg=typer.colors.GREEN)
+
+    def download(self, remote: str = "remote:backup"):
+        """Download backups from a remote into the local backups/ directory."""
+        typer.echo(f"📥  Downloading backups from {remote} via Docker container...")
+        self._ensure_backup_dir()
+        self._run("copy", remote, "/backups", "--progress")
+        typer.secho("✅  Download complete.", fg=typer.colors.GREEN)
+
+    def config(self):
+        """Open the interactive rclone config wizard inside the container."""
+        typer.echo("🔧  Launching rclone config inside Docker container...")
+        typer.echo("    Config will be saved to services/rclone/config/rclone.conf")
+        cmd = "docker compose --profile backup run --rm rclone config"
+        CommandRunner.run(cmd)
+
+
+    def setup_cron(self, schedule: str | None = None):
+        """Add a root-crontab entry for daily backup → upload.
+
+        The cron schedule is resolved in priority order:
+          1. ``schedule`` argument (passed from CLI --schedule option)
+          2. ``BACKUP_CRON_SCHEDULE`` environment variable (set in .env)
+          3. Hardcoded default: ``0 2 * * *``  (02:00 AM daily)
+        """
         repo_dir = os.getcwd()
-        
-        # Find uv path
-        uv_path = CommandRunner.run("which uv", capture=True).strip()
-        if not uv_path:
-            uv_path = "uv" # fallback
-            
-        # Build the cron command
-        cron_cmd = f"0 2 * * * cd {repo_dir} && {uv_path} run tools.py backup-create && {uv_path} run tools.py backup-upload >> {repo_dir}/backups/cron.log 2>&1"
-        
-        typer.echo("Setting up daily cronjob (at 02:00 AM)...")
-        
-        # Check if already exists
-        current_cron = CommandRunner.run("crontab -l", check=False, capture=True)
+        uv_path = CommandRunner.run("which uv", capture=True).strip() or "uv"
+
+        # Resolve schedule with priority: CLI arg > .env var > default
+        resolved_schedule = (
+            schedule
+            or os.environ.get("BACKUP_CRON_SCHEDULE")
+            or "0 2 * * *"
+        )
+
+        # Build cron entry — runs as root so Docker socket + file access is guaranteed
+        cron_cmd = (
+            f"{resolved_schedule} cd {repo_dir} && "
+            f"{uv_path} run tools.py backup-create && "
+            f"{uv_path} run tools.py backup-upload "
+            f">> {repo_dir}/backups/cron.log 2>&1"
+        )
+
+        typer.echo(f"⏰  Setting up crontab entry with schedule: {resolved_schedule!r}")
+
+        # Read existing root crontab
+        current_cron = CommandRunner.run("sudo crontab -l", check=False, capture=True) or ""
+
         if "tools.py backup-upload" in current_cron:
-            typer.echo("Cronjob already exists.")
+            typer.echo("Crontab entry already exists — nothing to do.")
+            typer.echo("  Remove it with 'sudo crontab -e' to change the schedule.")
             return
 
-        new_cron = current_cron + f"\n{cron_cmd}\n"
-        
-        # Write back
+        new_cron = current_cron.rstrip("\n") + f"\n{cron_cmd}\n"
+
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tf:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".cron", delete=False) as tf:
             tf.write(new_cron)
             temp_name = tf.name
-            
-        CommandRunner.run(f"crontab {temp_name}")
+
+        CommandRunner.run(f"sudo crontab {temp_name}")
         os.unlink(temp_name)
-        typer.secho("✅ Cronjob added successfully.", fg=typer.colors.GREEN)
+        typer.secho("✅  Crontab entry added successfully.", fg=typer.colors.GREEN)

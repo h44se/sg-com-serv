@@ -147,23 +147,35 @@ def backup_restore(
 @app.command()
 def backup_upload(
     remote: str = typer.Option("remote:backup", "--remote", "-r", help="Rclone remote name and path."),
-    config: str = typer.Option("services/rclone/rclone.conf", "--config", "-c", help="Path to rclone config.")
 ):
-    """Upload existing backups to cloud storage and rotate old files."""
-    RCloneManager(config_path=config).upload(remote=remote)
+    """Upload existing backups to cloud storage via the rclone Docker container and rotate old files."""
+    RCloneManager().upload(remote=remote)
 
 @app.command()
 def backup_download(
     remote: str = typer.Option("remote:backup", "--remote", "-r", help="Rclone remote name and path."),
-    config: str = typer.Option("services/rclone/rclone.conf", "--config", "-c", help="Path to rclone config.")
 ):
-    """Download backups from cloud storage."""
-    RCloneManager(config_path=config).download(remote=remote)
+    """Download backups from cloud storage via the rclone Docker container."""
+    RCloneManager().download(remote=remote)
 
 @app.command()
-def setup_backup_cron():
-    """Add a daily cronjob to the host for automated backups and cloud upload."""
-    RCloneManager().setup_cron()
+def backup_config():
+    """Launch the interactive rclone config wizard inside the Docker container."""
+    RCloneManager().config()
+
+@app.command()
+def setup_backup_cron(
+    schedule: str = typer.Option(
+        None,
+        "--schedule", "-s",
+        help=(
+            "Crontab schedule expression (e.g. '0 3 * * *' for 03:00 AM). "
+            "Falls back to BACKUP_CRON_SCHEDULE env var, then '0 2 * * *'."
+        ),
+    )
+):
+    """Add a daily root-crontab entry for automated backups and cloud upload."""
+    RCloneManager().setup_cron(schedule=schedule or None)
 
 @app.command()
 def lint(
