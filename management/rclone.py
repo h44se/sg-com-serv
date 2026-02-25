@@ -21,7 +21,7 @@ class RCloneManager:
         if not os.path.exists(self.backup_dir):
             os.makedirs(self.backup_dir)
 
-    def upload(self, remote: str = "remote:backup"):
+    def upload(self, remote: str = "backup:"):
         """Upload the local backups/ directory to a remote and rotate old files."""
         typer.echo(f"📤  Uploading backups to {remote} via Docker container...")
         # Inside the container ./backups is mounted at /backups
@@ -53,7 +53,7 @@ class RCloneManager:
         The cron schedule is resolved in priority order:
           1. ``schedule`` argument (passed from CLI --schedule option)
           2. ``BACKUP_CRON_SCHEDULE`` environment variable (set in .env)
-          3. Hardcoded default: ``0 2 * * *``  (02:00 AM daily)
+          3. Hardcoded default: ``0 5 * * 3``  (05:00 AM, every mittwoch)
         """
         repo_dir = os.getcwd()
         uv_path = CommandRunner.run("which uv", capture=True).strip() or "uv"
@@ -62,14 +62,16 @@ class RCloneManager:
         resolved_schedule = (
             schedule
             or os.environ.get("BACKUP_CRON_SCHEDULE")
-            or "0 2 * * *"
+            or "0 5 * * 3"
         )
 
         # Build cron entry — runs as root so Docker socket + file access is guaranteed
         cron_cmd = (
             f"{resolved_schedule} cd {repo_dir} && "
+            f"{uv_path} run tools.py docker stop && "
             f"{uv_path} run tools.py backup-create && "
-            f"{uv_path} run tools.py backup-upload "
+            f"{uv_path} run tools.py backup-upload ; "
+            f"{uv_path} run tools.py docker deploy "
             f">> {repo_dir}/backups/cron.log 2>&1"
         )
 

@@ -7,4 +7,5 @@ background:
 cardBlur: 10
 color: gray
 hideHostname: true
+footerText: "gonova.cloud"
 favicon: /images/favicon.ico

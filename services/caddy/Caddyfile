@@ -12,9 +12,9 @@
 
 dashboard.{$DOMAIN_NAME} {
     # Basic Auth - will be managed by tools.py
-    import auth/dashboard.{$DOMAIN_NAME}.caddy
+    import auth/default.caddy
 
-    reverse_proxy homepage:3000
+    reverse_proxy dashboard:3000
     
     log {
         output file /var/log/caddy/dashboard.access.log
@@ -23,7 +23,7 @@ dashboard.{$DOMAIN_NAME} {
 
 netdata.{$DOMAIN_NAME} {
     # Basic Auth - will be managed by tools.py
-    import auth/netdata.{$DOMAIN_NAME}.caddy
+    import auth/default.caddy
 
     reverse_proxy netdata:19999
     

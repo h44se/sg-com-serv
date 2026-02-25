@@ -173,20 +173,20 @@ services:
   # Runs as root (uid 0:0) so it can read every volume regardless of
   # the owning user set by other containers.
   # ──────────────────────────────────────────────────────────────────
-  # rclone:
-  #   build: ./services/rclone
-  #   container_name: rclone
-  #   user: "0:0"
-  #   profiles:
-  #     - backup
-  #   volumes:
-  #     - ./services/rclone/config:/config/rclone
-  #     - ./backups:/backups
-  #     - ./services:/services:ro
-  #   environment:
-  #     - TZ=${TIMEZONE:-UTC}
-  #   networks:
-  #     - server_net
+  rclone:
+    build: ./services/rclone
+    container_name: rclone
+    user: "0:0"
+    profiles:
+      - backup
+    volumes:
+      - ./services/rclone/:/config/rclone/
+      - ./backups:/backups
+      - ./services:/services:ro
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+    networks:
+      - server_net
 
   backup:
     build: ./services/backup
@@ -198,6 +198,8 @@ services:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
       - ./services/rclone/rclone.conf:/root/.config/rclone/rclone.conf:ro
+      - ./backups:/backups
+      - ./services:/services:ro
     environment:
       - TZ=${TIMEZONE:-UTC}
     networks:

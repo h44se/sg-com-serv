@@ -1,7 +1,7 @@
 - Infrastructure:
     - Netdata:
         icon: netdata.png
-        href: https://netdata.${DOMAIN_NAME}
+        href: https://netdata.gonova.cloud
         description: Real-time monitoring
         server: local
         container: netdata
@@ -12,7 +12,7 @@
 - Communication:
     - TeamSpeak 3:
         icon: teamspeak.png
-        href: ts3server://${DOMAIN_NAME}
+        href: ts3server://ts.gonova.cloud
         description: Voice Server
         server: local
         container: teamspeak3

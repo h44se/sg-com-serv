@@ -107,7 +107,7 @@ class BackupManager:
         # CommandRunner.run("docker compose down", check=False)
 
         # ── Bind-mount files & directories ──────────────────────────
-        items_to_copy = [".env", "docker-compose.yml", "services"]
+        items_to_copy = [".env", "docker-compose.yml", "services/caddy", "services/dashboard", "services/favicon", "services/rclone", "services/teamspeak", "services/tswatch"]
         for item in items_to_copy:
             src = os.path.join(self.repo_dir, item)
             if os.path.exists(src):

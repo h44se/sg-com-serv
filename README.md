@@ -208,7 +208,7 @@ Data persistence is handled via Docker volumes and configuration files. To ensur
    uv run tools.py setup-backup-cron
    ```
 
-   See the [Rclone Guide](./docs/services/rclone.md) for setup and encryption details. Backups on the cloud are automatically rotated after **14 days**.
+   See the [Rclone Guide](./docs/services/rclone/rclone.md) for setup and encryption details. Backups on the cloud are automatically rotated after **14 days**.
 
 ### Update Workflow
 

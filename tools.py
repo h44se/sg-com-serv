@@ -146,7 +146,7 @@ def backup_restore(
 
 @app.command()
 def backup_upload(
-    remote: str = typer.Option("remote:backup", "--remote", "-r", help="Rclone remote name and path."),
+    remote: str = typer.Option("backup:", "--remote", "-r", help="Rclone remote name and path."),
 ):
     """Upload existing backups to cloud storage via the rclone Docker container and rotate old files."""
     RCloneManager().upload(remote=remote)
