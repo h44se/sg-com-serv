@@ -98,7 +98,70 @@ uv run tools.py auth add-user admin --vhost netdata.yourdomain.com
 docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 ```
 
-### 6.2. Enable Automated Cloud Backups
+### 6.2. Install the CrowdSec Firewall Bouncer (Required)
+
+The CrowdSec container only *detects* intrusions. To actually **block** malicious IPs at
+the kernel level, you must install the firewall bouncer on the host.
+
+1. **Add the CrowdSec APT repository** (if not already done by `setup-system`):
+
+    ```bash
+    curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh \
+      | sudo bash
+    ```
+
+2. **Check your firewall backend**:
+
+    ```bash
+    iptables -V   # mentions 'nf_tables'? → nftables. Otherwise → iptables
+    ```
+
+3. **Install the matching bouncer package**:
+
+    ```bash
+    # nftables (Ubuntu 22.04+ default):
+    sudo apt install crowdsec-firewall-bouncer-nftables
+
+    # iptables (older systems):
+    sudo apt install crowdsec-firewall-bouncer-iptables
+    ```
+
+4. **Generate an API key** inside the running CrowdSec container:
+
+    ```bash
+    docker exec crowdsec cscli bouncers add firewall-bouncer-host
+    ```
+
+    Copy the key — it is shown only once.
+
+5. **Configure the bouncer**:
+
+    ```bash
+    sudo nano /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+    ```
+
+    Set:
+    ```yaml
+    api_url: http://127.0.0.1:8080    # LAPI exposed by docker-compose.yml
+    api_key: <YOUR_API_KEY_HERE>
+    mode: nftables                    # or: iptables
+    ```
+
+6. **Enable and start**:
+
+    ```bash
+    sudo systemctl enable --now crowdsec-firewall-bouncer
+    ```
+
+7. **Verify** the bouncer is registered:
+
+    ```bash
+    docker exec crowdsec cscli bouncers list
+    ```
+
+> See `docs/services/crowdsec/crowdsec.md` for the full reference including troubleshooting.
+
+### 6.3. Enable Automated Cloud Backups
 
 Rclone runs as a Docker container, so no host-side installation is required.
 
