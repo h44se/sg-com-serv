@@ -103,8 +103,8 @@ class BackupManager:
         tmp_dir = os.path.join(self.backup_dir, backup_folder_name)
         os.makedirs(tmp_dir)
 
-        typer.echo("⏹️   Stopping services for consistent backup...")
-        CommandRunner.run("docker compose down", check=False)
+        # typer.echo("⏹️   Stopping services for consistent backup...")
+        # CommandRunner.run("docker compose down", check=False)
 
         # ── Bind-mount files & directories ──────────────────────────
         items_to_copy = [".env", "docker-compose.yml", "services"]
@@ -120,11 +120,11 @@ class BackupManager:
             else:
                 typer.secho(f"  ⚠️   {item} not found — skipping.", fg=typer.colors.YELLOW)
 
-        # ── Named Docker volumes (auto-discovered from docker-compose.yml) ──
-        typer.echo("🔍  Discovering named volumes from docker-compose.yml...")
-        volumes = self._get_compose_volumes()
-        for vol in volumes:
-            self._backup_volume(vol, tmp_dir)
+        # # ── Named Docker volumes (auto-discovered from docker-compose.yml) ──
+        # typer.echo("🔍  Discovering named volumes from docker-compose.yml...")
+        # volumes = self._get_compose_volumes()
+        # for vol in volumes:
+        #     self._backup_volume(vol, tmp_dir)
 
         # ── Create master archive ────────────────────────────────────
         master_archive = os.path.join(self.backup_dir, f"{backup_folder_name}.tar.gz")
@@ -133,8 +133,8 @@ class BackupManager:
         shutil.rmtree(tmp_dir)
 
         typer.secho(f"✅  Backup created: {master_archive}", fg=typer.colors.GREEN)
-        typer.echo("▶️   Restarting services...")
-        CommandRunner.run("docker compose up -d")
+        # typer.echo("▶️   Restarting services...")
+        # CommandRunner.run("docker compose up -d")
 
     def restore(self, archive_path: str):
         archive_path = os.path.abspath(archive_path)
