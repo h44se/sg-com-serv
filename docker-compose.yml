@@ -61,9 +61,6 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
@@ -127,6 +124,9 @@ services:
       - server_net
     environment:
       HOMEPAGE_ALLOWED_HOSTS: dashboard.${DOMAIN_NAME:-localhost}
+      HOMEPAGE_VAR_CALENDAR_URL: ${DASHBOARD_CALENDAR_URL}
+      HOMEPAGE_VAR_CROWDSEC_USER: ${CROWDSEC_USER}
+      HOMEPAGE_VAR_CROWDSEC_PASS: ${CROWDSEC_PASS}
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (res) => { if (res.statusCode === 200) process.exit(0); else process.exit(1); }).on('error', () => process.exit(1))"]
       interval: 30s
@@ -165,14 +165,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # ──────────────────────────────────────────────────────────────────
-  # rclone — one-off backup container.
-  # Does NOT start with `docker compose up`. Invoke via:
-  #   docker compose run --rm rclone <args>
-  # or through: uv run tools.py backup-upload / backup-download
-  # Runs as root (uid 0:0) so it can read every volume regardless of
-  # the owning user set by other containers.
-  # ──────────────────────────────────────────────────────────────────
   rclone:
     build: ./services/rclone
     container_name: rclone

@@ -1,13 +1,27 @@
-- Infrastructure:
-    - Netdata:
-        icon: netdata.png
-        href: https://netdata.gonova.cloud
-        description: Real-time monitoring
-        server: local
-        container: netdata
+- Events:
+    - Calendar:
         widget:
-          type: netdata
-          url: http://netdata:19999
+          type: calendar
+          view: monthly
+          maxEvents: 10
+          showTime: true
+          timezone: Europe/Berlin
+          integrations:
+            - type: ical
+              color: green
+              url: {{HOMEPAGE_VAR_CALENDAR_URL}}
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda
+          maxEvents: 10
+          showTime: true
+          previousDays: 3
+          integrations:
+            - type: ical
+              color: green
+              showTime: true
+              url: {{HOMEPAGE_VAR_CALENDAR_URL}}
 
 - Communication:
     - TeamSpeak 3:
@@ -32,6 +46,27 @@
               format: number
 
 - Security & Proxy:
+    - Netdata:
+        icon: netdata.png
+        href: https://netdata.gonova.cloud
+        description: Real-time monitoring
+        server: local
+        container: netdata
+        widget:
+          type: netdata
+          url: http://netdata:19999
+    - CrowdSec:
+        icon: crowdsec.png
+        description: Community Threat Intel
+        href: https://crowdsec.net/
+        server: local
+        container: crowdsec
+        widget:
+          type: crowdsec
+          url: http://crowdsec:8080
+          username: {{HOMEPAGE_VAR_CROWDSEC_USER}}
+          password: {{HOMEPAGE_VAR_CROWDSEC_PASS}}
+          fields: ["bans"]
     - Caddy:
         icon: caddy.png
         description: Reverse Proxy Management
@@ -40,9 +75,3 @@
     - Fail2Ban:
         icon: fail2ban.png
         description: Intrusion Prevention
-    - CrowdSec:
-        icon: crowdsec.png
-        description: Community Threat Intel
-        href: https://crowdsec.net/
-        server: local
-        container: crowdsec

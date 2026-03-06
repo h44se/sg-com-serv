@@ -3,7 +3,7 @@
     memory: true
 - datetime:
     text_size: xl
+    locale: de
     format:
-      date: "DD MMM YYYY"
-      time: "HH:mm"
-      hour12: false
+        dateStyle: long
+        timeStyle: short
