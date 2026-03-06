@@ -101,6 +101,9 @@ services:
       - ./services/caddy/logs:/var/log/caddy/
     networks:
       - server_net
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     healthcheck:
       test: ["CMD", "caddy", "version"]
       interval: 30s
