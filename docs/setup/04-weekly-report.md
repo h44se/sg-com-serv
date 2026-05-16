@@ -38,6 +38,7 @@ REPORT_BACKUP_CRIT_DAYS=14
 ```
 
 `REPORT_TO` supports comma-separated recipients.
+`tools.py` automatically loads `.env`, so cron does not need an explicit `source` command.
 
 ## 2) Send a test report manually
 

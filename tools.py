@@ -7,7 +7,9 @@ from management.backup import BackupManager
 from management.rclone import RCloneManager
 from management.maintenance import MaintenanceManager
 from management.reporting import ReportingManager
-from management.utils import lint_markdown, fix_markdown_newlines, setup_dotenv
+from management.utils import lint_markdown, fix_markdown_newlines, setup_dotenv, load_dotenv
+
+load_dotenv()
 
 app = typer.Typer(help="CLI tools for server documentation and setup management.")
 

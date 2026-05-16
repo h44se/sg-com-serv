@@ -2,6 +2,34 @@ import os
 import subprocess
 import typer
 
+
+def load_dotenv(path: str = ".env", override: bool = False):
+    """Load key/value pairs from a dotenv file into os.environ.
+
+    Existing environment variables are preserved unless override=True.
+    """
+    if not os.path.exists(path):
+        return
+
+    with open(path, "r", encoding="utf-8") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+
+            if not key:
+                continue
+
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in {"\"", "'"}:
+                value = value[1:-1]
+
+            if override or key not in os.environ:
+                os.environ[key] = value
+
 def lint_markdown(paths, config):
     """Run Markdown linter."""
     typer.echo(f"Linting: {', '.join(paths)}")
