@@ -1,6 +1,7 @@
 - resources:
     cpu: true
     memory: true
+    uptime: true
 - datetime:
     text_size: xl
     locale: de
