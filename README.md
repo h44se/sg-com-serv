@@ -17,6 +17,7 @@ To get started with the server setup, follow these guides in order:
 1. [First Steps](./docs/setup/01-first-steps.md) - Initial server hardening and base installation.
 2. [Adding a New Service](./docs/setup/02-add-new-service.md) - How to extend this repository.
 3. [Basic Authentication](./docs/setup/03-security-auth.md) - Secure your dashboard and monitoring.
+4. [Weekly Owner Report](./docs/setup/04-weekly-report.md) - Configure weekly SMTP health emails.
 
 ### Automated Setup
 
@@ -81,6 +82,8 @@ This repository includes a Python CLI for server management and documentation ma
 - `list-services`: Visualize all configured services in the CLI.
 - `lint`: Check markdown files for formatting issues.
 - `fix-newlines`: Fix trailing newlines in markdown files.
+- `report-send`: Generate and send a weekly owner report via SMTP.
+- `setup-report-cron`: Install a weekly root crontab entry for report emails.
 
 ### Usage Example
 

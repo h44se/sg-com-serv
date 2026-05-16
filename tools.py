@@ -6,6 +6,7 @@ from management.docker import DockerManager
 from management.backup import BackupManager
 from management.rclone import RCloneManager
 from management.maintenance import MaintenanceManager
+from management.reporting import ReportingManager
 from management.utils import lint_markdown, fix_markdown_newlines, setup_dotenv
 
 app = typer.Typer(help="CLI tools for server documentation and setup management.")
@@ -201,6 +202,25 @@ def housekeep():
     Perform a complete housekeeping routine: update system, backup data, check for updates, and prune Docker.
     """
     MaintenanceManager().housekeep()
+
+@app.command("report-send")
+def report_send():
+    """Generate and send the weekly owner report via SMTP."""
+    ReportingManager().send_weekly_report()
+
+@app.command()
+def setup_report_cron(
+    schedule: str = typer.Option(
+        None,
+        "--schedule", "-s",
+        help=(
+            "Crontab schedule expression (e.g. '0 7 * * 1' for Mondays at 07:00). "
+            "Falls back to REPORT_CRON_SCHEDULE env var, then '0 7 * * 1'."
+        ),
+    )
+):
+    """Add a root-crontab entry for weekly SMTP reporting."""
+    ReportingManager().setup_cron(schedule=schedule or None)
     
 auth_app = typer.Typer(help="User authentication management.")
 app.add_typer(auth_app, name="auth")
