@@ -83,6 +83,8 @@ This repository includes a Python CLI for server management and documentation ma
 - `lint`: Check markdown files for formatting issues.
 - `fix-newlines`: Fix trailing newlines in markdown files.
 - `report-send`: Generate and send a weekly owner report via SMTP.
+- `report-send --print-only`: Print the report to stdout without sending email.
+- `generate-report`: Alias to print report only (no email send).
 - `setup-report-cron`: Install a weekly root crontab entry for report emails.
 
 ### Usage Example

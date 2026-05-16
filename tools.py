@@ -206,9 +206,20 @@ def housekeep():
     MaintenanceManager().housekeep()
 
 @app.command("report-send")
-def report_send():
-    """Generate and send the weekly owner report via SMTP."""
-    ReportingManager().send_weekly_report()
+def report_send(
+    print_only: bool = typer.Option(
+        False,
+        "--print-only",
+        help="Print the report to stdout without sending email.",
+    )
+):
+    """Generate weekly owner report and send it via SMTP."""
+    ReportingManager().send_weekly_report(print_only=print_only)
+
+@app.command("generate-report")
+def generate_report():
+    """Generate and print the weekly owner report without sending email."""
+    ReportingManager().send_weekly_report(print_only=True)
 
 @app.command()
 def setup_report_cron(

@@ -33,10 +33,15 @@ class ReportingManager:
         self.hostname = socket.gethostname()
         self.findings: list[Finding] = []
 
-    def send_weekly_report(self):
+    def send_weekly_report(self, print_only: bool = False):
         typer.secho("Preparing weekly server report...", fg=typer.colors.CYAN)
         self._collect_all()
         report_text = self._render_report()
+
+        if print_only:
+            typer.echo(report_text)
+            return
+
         subject = self._build_subject()
 
         try:

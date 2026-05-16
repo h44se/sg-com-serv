@@ -46,6 +46,18 @@ REPORT_BACKUP_CRIT_DAYS=14
 uv run tools.py report-send
 ```
 
+To preview the report without SMTP delivery:
+
+```bash
+uv run tools.py report-send --print-only
+```
+
+Equivalent alias:
+
+```bash
+uv run tools.py generate-report
+```
+
 If SMTP delivery fails, the report is written to `backups/reports/weekly_YYYYMMDD_HHMMSS.txt`.
 
 ## 3) Install weekly cron
