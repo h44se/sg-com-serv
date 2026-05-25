@@ -45,6 +45,12 @@
               label: Slot-Limit
               format: number
 
+- Tools:
+    - Formula One Dashboard:
+        description: Formula 1 schedule and standings
+        server: local
+        container: formula-one-dashboard-frontend
+
 - Security & Proxy:
     - Netdata:
         icon: netdata.png
