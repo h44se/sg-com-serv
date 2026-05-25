@@ -6,6 +6,17 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+coverage/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
 
 # Environment
 .env

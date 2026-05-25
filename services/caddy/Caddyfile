@@ -31,3 +31,11 @@ netdata.{$DOMAIN_NAME} {
         output file /var/log/caddy/netdata.access.log
     }
 }
+
+f1.{$DOMAIN_NAME} {
+    reverse_proxy formula-one-dashboard-frontend:3000
+
+    log {
+        output file /var/log/caddy/f1.access.log
+    }
+}
