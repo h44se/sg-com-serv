@@ -350,6 +350,16 @@ button, input, select, textarea { font: inherit; }
 
 @media (max-width: 640px) {
   .dashboard-page { padding: 12px; }
+  .session-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+  }
+  .rank { text-align: left; }
+  .session-row span:last-child {
+    margin: 0;
+    text-align: right;
+  }
   .table-head { flex-direction: column; }
   .table-actions { justify-content: flex-start; }
   .wins-cell,
