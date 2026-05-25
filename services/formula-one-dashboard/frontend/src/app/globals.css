@@ -220,7 +220,13 @@ button, input, select, textarea { font: inherit; }
 }
 .session-row span:last-child { color: var(--muted); font-size: 0.78rem; margin: 0; }
 
-.venue-card {
+.venue-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.venue-panel {
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -229,11 +235,8 @@ button, input, select, textarea { font: inherit; }
   padding: 14px;
 }
 
-.venue-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
-  gap: 10px;
-  min-height: 0;
+.track-map-panel {
+  min-width: 0;
 }
 
 .venue-title {
@@ -263,10 +266,8 @@ button, input, select, textarea { font: inherit; }
   filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.42));
 }
 
-.weather-panel {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 8px;
+.weather-tile {
+  min-width: 0;
 }
 
 .weather-header {
@@ -413,8 +414,7 @@ button, input, select, textarea { font: inherit; }
   .data-row,
   .compact-hero,
   .next-session-stack,
-  .venue-card { grid-template-columns: 1fr; }
-  .venue-content { grid-template-columns: 1fr; }
+  .venue-grid { grid-template-columns: 1fr; }
   .hero-meta { min-width: 0; grid-template-columns: 1fr; }
 }
 

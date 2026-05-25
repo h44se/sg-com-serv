@@ -100,8 +100,10 @@ describe("DashboardShell weather panel", () => {
   it("renders only Friday to Sunday forecast entries", () => {
     const html = renderToStaticMarkup(createElement(DashboardShell, { snapshot, timeZone: "UTC" }));
 
+    expect(html).toContain("Circuit de Monaco");
     expect(html).toContain("Weekend weather");
-    expect(html).toContain("Fri / Sat / Sun");
+    expect(html).toContain("Weekend forecast");
+    expect(html).not.toContain("Fri / Sat / Sun");
     expect(html).toContain("Fri");
     expect(html).toContain("Sat");
     expect(html).toContain("Sun");

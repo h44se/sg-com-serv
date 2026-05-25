@@ -62,39 +62,45 @@ function selectWeekendWeatherDays(days: WeatherForecastDay[]) {
   return WEATHER_DAY_LABELS.map((label) => days.find((day) => day.label === label)).filter((day): day is WeatherForecastDay => Boolean(day));
 }
 
-function VenuePanel({ venue }: { venue: VenueContext | null }) {
+function TrackMapPanel({ venue }: { venue: VenueContext | null }) {
   const circuitName = venue?.circuit_name ?? "Circuit map";
-  const weatherDays = selectWeekendWeatherDays(venue?.weather_forecast ?? []);
 
   return (
-    <article className="panel venue-card">
+    <article className="panel venue-panel track-map-panel">
       <div className="venue-title">
         <p className="eyebrow">Circuit</p>
         <h2 className="panel-title">{circuitName}</h2>
       </div>
-      <div className="venue-content">
-        <div className="venue-map" aria-label="Circuit map">
-          {venue?.track_map_svg ? <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} /> : <span>Track map unavailable</span>}
+      <div className="venue-map" aria-label="Circuit map">
+        {venue?.track_map_svg ? <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} /> : <span>Track map unavailable</span>}
+      </div>
+    </article>
+  );
+}
+
+function WeatherPanel({ venue }: { venue: VenueContext | null }) {
+  const weatherDays = selectWeekendWeatherDays(venue?.weather_forecast ?? []);
+
+  return (
+    <article className="panel venue-panel weather-tile" aria-label="Weekend weather">
+      <div className="weather-header">
+        <div>
+          <p className="eyebrow">Weather</p>
+          <h2 className="panel-title">Weekend forecast</h2>
         </div>
-        <section className="weather-panel" aria-label="Weekend weather">
-          <div className="weather-header">
-            <p className="eyebrow">Weather</p>
-            <span className="tag">Fri / Sat / Sun</span>
-          </div>
-          <div className="weather-list">
-            {weatherDays.length === 0 ? (
-              <div className="weather-day empty-cell">No Friday to Sunday forecast available.</div>
-            ) : (
-              weatherDays.map((day) => (
-                <article className={`weather-day${day.is_wet ? " is-wet" : ""}`} key={day.date}>
-                  <span className="weather-label">{day.label}</span>
-                  <p className="weather-temp">{formatTemperatureRange(day)}</p>
-                  <p className="weather-meta">Rain {day.precipitation_probability_max != null ? `${day.precipitation_probability_max}%` : "n/a"}</p>
-                </article>
-              ))
-            )}
-          </div>
-        </section>
+      </div>
+      <div className="weather-list">
+        {weatherDays.length === 0 ? (
+          <div className="weather-day empty-cell">No Friday to Sunday forecast available.</div>
+        ) : (
+          weatherDays.map((day) => (
+            <article className={`weather-day${day.is_wet ? " is-wet" : ""}`} key={day.date}>
+              <span className="weather-label">{day.label}</span>
+              <p className="weather-temp">{formatTemperatureRange(day)}</p>
+              <p className="weather-meta">Rain {day.precipitation_probability_max != null ? `${day.precipitation_probability_max}%` : "n/a"}</p>
+            </article>
+          ))
+        )}
       </div>
     </article>
   );
@@ -234,7 +240,10 @@ export function DashboardShell({ snapshot, timeZone }: DashboardShellProps) {
           {nextSession ? <CountdownTimer targetUtcIso={nextSession.date_start_utc} label={nextSession.session_name} /> : null}
           <SessionsPanel sessions={snapshot.sessions} timeZone={timeZone} />
         </div>
-        <VenuePanel venue={snapshot.venue} />
+        <div className="venue-grid">
+          <TrackMapPanel venue={snapshot.venue} />
+          <WeatherPanel venue={snapshot.venue} />
+        </div>
       </section>
 
       <section className="data-row" aria-label="Latest result and championship standings">
