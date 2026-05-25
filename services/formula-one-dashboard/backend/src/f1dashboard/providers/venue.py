@@ -66,7 +66,8 @@ class VenueClient:
                 ]
             ),
             "timezone": "UTC",
-            "forecast_days": 7,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
         }
         data = self._get_json("https://api.open-meteo.com/v1/forecast", params=params)
         daily = data.get("daily", {}) if isinstance(data, dict) else {}

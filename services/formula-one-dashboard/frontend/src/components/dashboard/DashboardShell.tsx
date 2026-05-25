@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import type { ClassificationRow, DashboardSnapshot, Session, VenueContext } from "@/lib/dashboard-types";
+import type { ClassificationRow, DashboardSnapshot, Session, VenueContext, WeatherForecastDay } from "@/lib/dashboard-types";
 import { formatUtcInTimeZone } from "@/lib/timezone";
 import { CountdownTimer } from "./CountdownTimer";
 import { StandingsTable } from "./StandingsTable";
@@ -43,8 +43,28 @@ function buildPages(rowCount: number, pageSize: number) {
   return Math.max(Math.ceil(rowCount / pageSize), 1);
 }
 
+const WEATHER_DAY_LABELS = ["Fri", "Sat", "Sun"] as const;
+
+function formatTemperatureRange(day: WeatherForecastDay) {
+  if (day.temperature_max_c == null && day.temperature_min_c == null) {
+    return "Temp unavailable";
+  }
+  if (day.temperature_max_c == null) {
+    return `Low ${Math.round(day.temperature_min_c ?? 0)}C`;
+  }
+  if (day.temperature_min_c == null) {
+    return `High ${Math.round(day.temperature_max_c)}C`;
+  }
+  return `${Math.round(day.temperature_max_c)}C / ${Math.round(day.temperature_min_c)}C`;
+}
+
+function selectWeekendWeatherDays(days: WeatherForecastDay[]) {
+  return WEATHER_DAY_LABELS.map((label) => days.find((day) => day.label === label)).filter((day): day is WeatherForecastDay => Boolean(day));
+}
+
 function VenuePanel({ venue }: { venue: VenueContext | null }) {
   const circuitName = venue?.circuit_name ?? "Circuit map";
+  const weatherDays = selectWeekendWeatherDays(venue?.weather_forecast ?? []);
 
   return (
     <article className="panel venue-card">
@@ -52,8 +72,29 @@ function VenuePanel({ venue }: { venue: VenueContext | null }) {
         <p className="eyebrow">Circuit</p>
         <h2 className="panel-title">{circuitName}</h2>
       </div>
-      <div className="venue-map" aria-label="Circuit map">
-        {venue?.track_map_svg ? <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} /> : <span>Track map unavailable</span>}
+      <div className="venue-content">
+        <div className="venue-map" aria-label="Circuit map">
+          {venue?.track_map_svg ? <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} /> : <span>Track map unavailable</span>}
+        </div>
+        <section className="weather-panel" aria-label="Weekend weather">
+          <div className="weather-header">
+            <p className="eyebrow">Weather</p>
+            <span className="tag">Fri / Sat / Sun</span>
+          </div>
+          <div className="weather-list">
+            {weatherDays.length === 0 ? (
+              <div className="weather-day empty-cell">No Friday to Sunday forecast available.</div>
+            ) : (
+              weatherDays.map((day) => (
+                <article className={`weather-day${day.is_wet ? " is-wet" : ""}`} key={day.date}>
+                  <span className="weather-label">{day.label}</span>
+                  <p className="weather-temp">{formatTemperatureRange(day)}</p>
+                  <p className="weather-meta">Rain {day.precipitation_probability_max != null ? `${day.precipitation_probability_max}%` : "n/a"}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
       </div>
     </article>
   );
