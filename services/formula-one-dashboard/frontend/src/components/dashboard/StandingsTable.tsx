@@ -20,7 +20,6 @@ export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTablePro
   const startIndex = safePageIndex * pageSize;
   const visibleRows = useMemo(() => rows.slice(startIndex, startIndex + pageSize), [pageSize, rows, startIndex]);
   const canPaginate = rows.length > pageSize;
-  const topCount = Math.min(rows.length, pageSize);
 
   return (
     <section className="table-card">
@@ -53,7 +52,6 @@ export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTablePro
             <th className="pos-cell">Pos</th>
             <th>Competitor</th>
             <th className="points-cell">Pts</th>
-            <th className="wins-cell">Wins</th>
           </tr>
         </thead>
         <tbody>
@@ -72,7 +70,6 @@ export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTablePro
                   {row.gap ? <p className="item-meta">Gap {row.gap}</p> : null}
                 </td>
                 <td className="points-cell">{row.points.toFixed(0)}</td>
-                <td className="wins-cell">{row.wins ?? 0}</td>
               </tr>
             ))
           )}
