@@ -169,13 +169,17 @@ class VenueClient:
         pad = 14
         view_w = 180
         view_h = 120
-        scale = min((view_w - pad * 2) / width, (view_h - pad * 2) / height)
+        drawable_w = view_w - pad * 2
+        drawable_h = view_h - pad * 2
+        scale = min(drawable_w / width, drawable_h / height)
+        offset_x = pad + (drawable_w - width * scale) / 2
+        offset_y = pad + (drawable_h - height * scale) / 2
 
         def tx(x: float) -> float:
-            return (x - min_x) * scale + pad
+            return (x - min_x) * scale + offset_x
 
         def ty(y: float) -> float:
-            return (max_y - y) * scale + pad
+            return (max_y - y) * scale + offset_y
 
         path = " ".join([
             f"M {tx(sampled[0][0]):.1f} {ty(sampled[0][1]):.1f}",
