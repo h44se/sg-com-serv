@@ -33,6 +33,10 @@ netdata.{$DOMAIN_NAME} {
 }
 
 f1.{$DOMAIN_NAME} {
+    header {
+        X-Robots-Tag "noindex, nofollow, noarchive"
+    }
+
     reverse_proxy formula-one-dashboard-frontend:3000
 
     log {
