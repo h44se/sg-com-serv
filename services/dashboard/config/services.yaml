@@ -46,10 +46,12 @@
               format: number
 
 - Tools:
-    - Formula One Dashboard:
+    - F1 Dashboard:
+        icon: https://upload.wikimedia.org/wikipedia/commons/f/f2/New_era_F1_logo.png
         description: Formula 1 schedule and standings
         server: local
         container: formula-one-dashboard-frontend
+        href: https://f1.gonova.cloud
 
 - Security & Proxy:
     - Netdata:
