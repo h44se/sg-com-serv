@@ -206,8 +206,8 @@ button, input, select, textarea { font: inherit; }
 .session-list { display: grid; gap: 7px; margin-top: 12px; }
 .session-row {
   display: grid;
-  grid-template-columns: 72px minmax(100px, 1fr) minmax(150px, 0.95fr);
-  gap: 10px;
+  grid-template-columns: minmax(120px, max-content) minmax(0, 1fr);
+  gap: 14px;
   align-items: center;
   border: 1px solid var(--line);
   background: var(--surface-2);
@@ -218,7 +218,7 @@ button, input, select, textarea { font: inherit; }
   border-color: rgba(255, 30, 45, 0.36);
   background: rgba(255, 30, 45, 0.08);
 }
-.session-row span:last-child { color: var(--muted); font-size: 0.78rem; margin: auto;}
+.session-row span:last-child { color: var(--muted); font-size: 0.78rem; margin: 0; }
 
 .venue-card {
   position: relative;
@@ -271,6 +271,8 @@ button, input, select, textarea { font: inherit; }
   font-weight: 850;
   text-align: center
 }
+
+.session-row .rank { text-align: left; }
 .result-meta-cell {
   color: var(--muted);
   font-size: 0.82rem;
@@ -350,16 +352,6 @@ button, input, select, textarea { font: inherit; }
 
 @media (max-width: 640px) {
   .dashboard-page { padding: 12px; }
-  .session-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px;
-    align-items: center;
-  }
-  .rank { text-align: left; }
-  .session-row span:last-child {
-    margin: 0;
-    text-align: right;
-  }
   .table-head { flex-direction: column; }
   .table-actions { justify-content: flex-start; }
   .wins-cell,
