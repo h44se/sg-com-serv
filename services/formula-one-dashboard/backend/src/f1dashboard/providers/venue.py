@@ -189,7 +189,7 @@ class VenueClient:
         return (
             '<svg viewBox="0 0 180 120" role="img" aria-label="Circuit minimap" xmlns="http://www.w3.org/2000/svg">'
             '<rect x="0" y="0" width="180" height="120" rx="16" fill="#0b0b0d"/>'
-            '<path d="{path}" fill="none" stroke="#ff1e2d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'
+            '<path d="{path}" fill="none" stroke="#ff1e2d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'
             '<circle cx="{start_x}" cy="{start_y}" r="4.2" fill="#ffffff" stroke="#ff1e2d" stroke-width="2"/>'
             '<circle cx="{end_x}" cy="{end_y}" r="4.2" fill="#ff1e2d" stroke="#ffffff" stroke-width="1.5"/>'
             '</svg>'
