@@ -135,7 +135,8 @@ button, input, select, textarea { font: inherit; }
 .stat-label,
 .table-label {
   display: block;
-  color: var(--muted-2);
+  font-weight: 850;
+  color: #ff1e2d;
   font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.64rem;
   letter-spacing: 0.13em;
