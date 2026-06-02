@@ -24,7 +24,6 @@ export function CountdownTimer({ targetUtcIso, label = "Countdown" }: CountdownT
           <p className="eyebrow">{label}</p>
           <h2 className="panel-title">Countdown to next session</h2>
         </div>
-        <span className="live-dot">Live</span>
       </div>
       <p className="countdown-value">{formatCountdown(targetUtcIso, now)}</p>
     </section>
