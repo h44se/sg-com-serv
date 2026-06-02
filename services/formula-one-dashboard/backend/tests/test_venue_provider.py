@@ -1,6 +1,9 @@
 from datetime import date
 
+import pytest
+
 from f1dashboard.providers.venue import VenueClient
+from f1dashboard.providers.venue import VenueError
 
 
 def test_weather_forecast_requests_meeting_date_range() -> None:
@@ -43,3 +46,13 @@ def test_weather_forecast_requests_meeting_date_range() -> None:
     assert [day["date"] for day in forecast] == ["2026-06-05", "2026-06-06", "2026-06-07"]
     assert forecast[1]["is_wet"] is True
     assert forecast[1]["summary"] == "Wet"
+
+
+def test_venue_client_wraps_timeout_error(monkeypatch) -> None:
+    def raise_timeout(*args, **kwargs):
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr("f1dashboard.providers.venue.urlopen", raise_timeout)
+
+    with pytest.raises(VenueError, match="timed out"):
+        VenueClient(circuits_client=None)._get_json("https://example.com")

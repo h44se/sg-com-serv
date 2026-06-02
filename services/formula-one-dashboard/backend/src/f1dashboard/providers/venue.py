@@ -5,6 +5,7 @@ from datetime import date, datetime
 from html import unescape
 from json import loads
 from math import hypot
+from socket import timeout as SocketTimeout
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
@@ -235,6 +236,8 @@ class VenueClient:
             raise VenueError(f"Venue request failed: {exc.code} {exc.reason} for {url}") from exc
         except URLError as exc:
             raise VenueError(f"Venue request failed: {exc.reason} for {url}") from exc
+        except (TimeoutError, SocketTimeout, OSError) as exc:
+            raise VenueError(f"Venue request timed out for {url}") from exc
 
 
 def _normalize(value: Any) -> str:

@@ -432,7 +432,10 @@ class DashboardService:
         if not meeting_raw:
             return None
 
-        circuit_details = self.venue_client.resolve_circuit(meeting_raw)
+        try:
+            circuit_details = self.venue_client.resolve_circuit(meeting_raw)
+        except VenueError:
+            return None
         if not circuit_details:
             return None
 

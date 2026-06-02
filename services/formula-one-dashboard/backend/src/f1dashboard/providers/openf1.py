@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from json import loads
+from socket import timeout as SocketTimeout
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -30,6 +31,8 @@ class OpenF1Client:
             raise OpenF1Error(f"OpenF1 request failed: {exc.code} {exc.reason} for {url}") from exc
         except URLError as exc:
             raise OpenF1Error(f"OpenF1 request failed: {exc.reason} for {url}") from exc
+        except (TimeoutError, SocketTimeout, OSError) as exc:
+            raise OpenF1Error(f"OpenF1 request timed out for {url}") from exc
 
     def latest_meeting(self) -> dict[str, Any] | None:
         data = self._get_json("/v1/meetings", {"meeting_key": "latest"})

@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+import pytest
+
 from f1dashboard.cache import MemoryTTLCache
 from f1dashboard.models import DashboardSnapshot
+from f1dashboard.providers.jolpica import JolpicaClient
 from f1dashboard.providers.jolpica import JolpicaError
 from f1dashboard.providers.openf1 import OpenF1Error
+from f1dashboard.providers.venue import VenueError
 from f1dashboard.services.dashboard import DashboardService
 
 
@@ -313,6 +317,19 @@ class BrokenStandingsClient(FakeStandingsClient):
         raise JolpicaError("Jolpica request failed")
 
 
+class TimeoutStandingsClient(FakeStandingsClient):
+    def latest_race_results(self):
+        raise JolpicaError("Jolpica request timed out")
+
+    def latest_qualifying_results(self):
+        raise JolpicaError("Jolpica request timed out")
+
+
+class BrokenVenueClient(FakeVenueClient):
+    def resolve_circuit(self, meeting_raw):
+        raise VenueError("Venue request timed out")
+
+
 def test_dashboard_service_builds_a_snapshot() -> None:
     service = DashboardService(
         client=FakeClient(),
@@ -459,3 +476,39 @@ def test_dashboard_service_returns_stale_cached_snapshot_when_refresh_is_rate_li
     assert snapshot is cached_snapshot
     assert snapshot.meeting is not None
     assert snapshot.meeting.meeting_name == "Canadian Grand Prix"
+
+
+def test_jolpica_client_wraps_timeout_error(monkeypatch) -> None:
+    def raise_timeout(*args, **kwargs):
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr("f1dashboard.providers.jolpica.urlopen", raise_timeout)
+
+    with pytest.raises(JolpicaError, match="timed out"):
+        JolpicaClient().latest_race_results()
+
+
+def test_dashboard_service_returns_fallback_results_when_jolpica_times_out() -> None:
+    service = DashboardService(
+        client=FakeClient(),
+        standings_client=TimeoutStandingsClient(),
+        venue_client=FakeVenueClient(),
+    )
+
+    snapshot = service.get_snapshot(refresh=True)
+
+    assert snapshot.latest_results[0].driver_number == 12
+    assert snapshot.latest_results[0].status == "Sprint Qualifying"
+
+
+def test_dashboard_service_skips_venue_when_venue_requests_fail() -> None:
+    service = DashboardService(
+        client=FakeClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=BrokenVenueClient(),
+    )
+
+    snapshot = service.get_snapshot(refresh=True)
+
+    assert snapshot.meeting is not None
+    assert snapshot.venue is None
