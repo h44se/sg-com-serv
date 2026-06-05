@@ -111,4 +111,36 @@ describe("DashboardShell weather panel", () => {
     expect(html).toContain("25C / 19C");
     expect(html).toContain("Rain 70%");
   });
+
+  it("renders an ongoing session card when the first open session is already live", () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardShell, {
+        snapshot: {
+          ...snapshot,
+          generated_at_utc: "2026-06-05T12:00:00Z",
+        },
+        timeZone: "UTC",
+      }),
+    );
+
+    expect(html).toContain("Ongoing session");
+    expect(html).toContain("Practice 1");
+    expect(html).toContain("Now live");
+    expect(html).not.toContain("Countdown to next session");
+  });
+
+  it("renders a fallback session card when schedule data is unavailable", () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardShell, {
+        snapshot: {
+          ...snapshot,
+          sessions: [],
+        },
+        timeZone: "UTC",
+      }),
+    );
+
+    expect(html).toContain("Weekend session data unavailable");
+    expect(html).toContain("Waiting for cached or live schedule data");
+  });
 });

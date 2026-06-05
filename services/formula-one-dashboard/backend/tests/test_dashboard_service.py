@@ -369,6 +369,22 @@ def test_dashboard_service_builds_a_snapshot() -> None:
     assert snapshot.generated_at_utc.tzinfo == timezone.utc
 
 
+def test_dashboard_service_keeps_ongoing_session_in_open_schedule() -> None:
+    service = DashboardService(
+        client=FakeClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        clock=lambda: datetime(2026, 5, 22, 20, 45, tzinfo=timezone.utc),
+    )
+
+    snapshot = service.get_snapshot(refresh=True)
+
+    assert snapshot.meeting is not None
+    assert [session.session_name for session in snapshot.sessions] == ["Sprint Qualifying", "Sprint", "Grand Prix"]
+    assert snapshot.sessions[0].date_start_utc < datetime(2026, 5, 22, 20, 45, tzinfo=timezone.utc)
+    assert snapshot.sessions[0].date_end_utc > datetime(2026, 5, 22, 20, 45, tzinfo=timezone.utc)
+
+
 def test_dashboard_service_skips_completed_latest_meeting_for_next_session() -> None:
     service = DashboardService(
         client=FakeClient(),
@@ -420,6 +436,17 @@ class RateLimitedClient(FakeClient):
         raise OpenF1Error("OpenF1 request failed: 429 Too Many Requests")
 
 
+class AuthLockedClient(FakeClient):
+    def latest_meeting(self):
+        raise OpenF1Error("OpenF1 request failed: 401 Unauthorized")
+
+    def latest_session(self):
+        raise OpenF1Error("OpenF1 request failed: 401 Unauthorized")
+
+    def meetings(self, year):
+        raise OpenF1Error("OpenF1 request failed: 401 Unauthorized")
+
+
 class PartialRateLimitedClient(FakeClient):
     def positions(self, session_key):
         raise OpenF1Error("OpenF1 request failed: 429 Too Many Requests")
@@ -450,7 +477,12 @@ def test_dashboard_service_returns_partial_snapshot_when_openf1_is_rate_limited(
 
 
 def test_dashboard_service_keeps_meeting_and_session_when_live_detail_calls_are_rate_limited() -> None:
-    service = DashboardService(client=PartialRateLimitedClient(), standings_client=FakeStandingsClient(), venue_client=FakeVenueClient())
+    service = DashboardService(
+        client=PartialRateLimitedClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        clock=lambda: datetime(2026, 5, 23, 14, 0, tzinfo=timezone.utc),
+    )
 
     snapshot = service.get_snapshot(refresh=True)
 
@@ -465,17 +497,57 @@ def test_dashboard_service_keeps_meeting_and_session_when_live_detail_calls_are_
 
 def test_dashboard_service_returns_stale_cached_snapshot_when_refresh_is_rate_limited() -> None:
     cache: MemoryTTLCache[DashboardSnapshot] = MemoryTTLCache()
-    warm_service = DashboardService(client=FakeClient(), standings_client=FakeStandingsClient(), venue_client=FakeVenueClient(), cache=cache)
+    warm_service = DashboardService(
+        client=FakeClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        cache=cache,
+        clock=lambda: datetime(2026, 5, 23, 14, 0, tzinfo=timezone.utc),
+    )
     cached_snapshot = warm_service.get_snapshot(refresh=True)
     cache.set("dashboard:snapshot", cached_snapshot, ttl_seconds=0)
 
-    rate_limited_service = DashboardService(client=RateLimitedClient(), standings_client=FakeStandingsClient(), venue_client=FakeVenueClient(), cache=cache)
+    rate_limited_service = DashboardService(
+        client=RateLimitedClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        cache=cache,
+        clock=lambda: datetime(2026, 5, 23, 14, 5, tzinfo=timezone.utc),
+    )
 
     snapshot = rate_limited_service.get_snapshot(refresh=True)
 
     assert snapshot is cached_snapshot
     assert snapshot.meeting is not None
     assert snapshot.meeting.meeting_name == "Canadian Grand Prix"
+
+
+def test_dashboard_service_restores_persisted_snapshot_when_live_api_is_locked(tmp_path) -> None:
+    snapshot_cache_path = tmp_path / "dashboard-snapshot.json"
+
+    warm_service = DashboardService(
+        client=FakeClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        clock=lambda: datetime(2026, 5, 22, 20, 45, tzinfo=timezone.utc),
+        snapshot_cache_path=str(snapshot_cache_path),
+    )
+    cached_snapshot = warm_service.get_snapshot(refresh=True)
+
+    locked_service = DashboardService(
+        client=AuthLockedClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        clock=lambda: datetime(2026, 5, 22, 20, 50, tzinfo=timezone.utc),
+        snapshot_cache_path=str(snapshot_cache_path),
+    )
+
+    snapshot = locked_service.get_snapshot(refresh=True)
+
+    assert snapshot.meeting is not None
+    assert snapshot.meeting.meeting_name == cached_snapshot.meeting.meeting_name
+    assert [session.session_name for session in snapshot.sessions] == ["Sprint Qualifying", "Sprint", "Grand Prix"]
+    assert snapshot.venue is not None
 
 
 def test_jolpica_client_wraps_timeout_error(monkeypatch) -> None:

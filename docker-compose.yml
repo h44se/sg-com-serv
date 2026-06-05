@@ -147,8 +147,11 @@ services:
     restart: unless-stopped
     environment:
       PYTHONUNBUFFERED: "1"
+      DASHBOARD_SNAPSHOT_CACHE_PATH: /var/lib/f1dashboard/dashboard-snapshot.json
     networks:
       - server_net
+    volumes:
+      - ./services/formula-one-dashboard/cache:/var/lib/f1dashboard
     healthcheck:
       test:
         - CMD-SHELL

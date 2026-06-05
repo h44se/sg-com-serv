@@ -9,11 +9,13 @@
 
 - `OPENF1_BASE_URL` — optional override for the OpenF1 provider base URL
 - `DASHBOARD_CACHE_TTL_SECONDS` — optional override for the dashboard cache TTL
+- `DASHBOARD_SNAPSHOT_CACHE_PATH` — optional path for the persisted last-known-good dashboard snapshot
 
 ## Operational notes
 
 - Treat OpenF1 as a partially rate-limited provider.
 - If live data returns 429, fall back to the last cached snapshot instead of failing the page.
+- Persist the last good dashboard snapshot so a restart during a live OpenF1 lockout can still render the current weekend context.
 - Keep timestamps in UTC until presentation time.
 - The frontend should display the browser timezone name so users can verify how the schedule is being converted.
 

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
+from dataclasses import asdict
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Callable
 
 from f1dashboard.cache import MemoryTTLCache
@@ -29,12 +33,15 @@ class DashboardService:
         venue_client: VenueClient | None = None,
         cache: MemoryTTLCache[DashboardSnapshot] | None = None,
         clock: Callable[[], datetime] | None = None,
+        snapshot_cache_path: str | None = None,
     ) -> None:
         self.client = client or OpenF1Client()
         self.standings_client = standings_client or JolpicaClient()
         self.venue_client = venue_client or VenueClient()
         self.cache = cache or MemoryTTLCache[DashboardSnapshot]()
         self.clock = clock or (lambda: datetime.now(timezone.utc))
+        configured_cache_path = snapshot_cache_path or os.getenv("DASHBOARD_SNAPSHOT_CACHE_PATH")
+        self.snapshot_cache_path = Path(configured_cache_path).expanduser() if configured_cache_path else None
 
     def get_snapshot(self, refresh: bool = False) -> DashboardSnapshot:
         cache_key = "dashboard:snapshot"
@@ -45,6 +52,12 @@ class DashboardService:
 
         critical_provider_error = False
         latest_session_raw = None
+        stale_snapshot = self._stale_snapshot(cache_key)
+
+        try:
+            latest_session_raw = self.client.latest_session()
+        except (AttributeError, OpenF1Error):
+            latest_session_raw = None
 
         try:
             meeting_raw = self._next_meeting_row()
@@ -62,12 +75,10 @@ class DashboardService:
                 critical_provider_error = True
 
         if critical_provider_error:
-            stale_snapshot = self.cache.get_stale(cache_key)
-            if stale_snapshot is not None and self._snapshot_has_future_session(stale_snapshot):
+            if stale_snapshot is not None and self._snapshot_has_open_or_future_session(stale_snapshot):
                 return stale_snapshot
 
-        upcoming_session_rows = self._upcoming_session_rows(meeting_raw)
-        session_rows = upcoming_session_rows
+        session_rows = self._open_session_rows(meeting_raw)
 
         meeting = self._meeting_from_raw(meeting_raw) if meeting_raw else None
         sessions = [self._session_from_raw(row) for row in session_rows]
@@ -97,11 +108,18 @@ class DashboardService:
             generated_at_utc=self.clock(),
         )
         self.cache.set(cache_key, snapshot, ttl_seconds=600)
+        self._persist_snapshot(snapshot)
         return snapshot
 
-    def _snapshot_has_future_session(self, snapshot: DashboardSnapshot) -> bool:
+    def _snapshot_has_open_or_future_session(self, snapshot: DashboardSnapshot) -> bool:
         now = _as_utc(self.clock())
-        return any(session.date_start_utc > now for session in snapshot.sessions)
+        return any(self._session_is_open_or_future(session.date_start_utc, session.date_end_utc, now) for session in snapshot.sessions)
+
+    def _stale_snapshot(self, cache_key: str) -> DashboardSnapshot | None:
+        cached = self.cache.get_stale(cache_key)
+        if cached is not None:
+            return cached
+        return self._load_persisted_snapshot()
 
     def _next_meeting_row(self) -> dict[str, Any] | None:
         now = _as_utc(self.clock())
@@ -155,7 +173,7 @@ class DashboardService:
             date_end_utc=end,
         )
 
-    def _upcoming_session_rows(self, meeting_raw: dict[str, Any] | None) -> list[dict[str, Any]]:
+    def _open_session_rows(self, meeting_raw: dict[str, Any] | None) -> list[dict[str, Any]]:
         if not meeting_raw:
             return []
 
@@ -165,10 +183,10 @@ class DashboardService:
             rows = []
 
         now = _as_utc(self.clock())
-        future_rows = [row for row in rows if (parse_utc_timestamp(row.get("date_start")) or datetime.min.replace(tzinfo=timezone.utc)) > now]
-        if not future_rows:
-            future_rows = self._future_session_rows_for_meeting(meeting_raw, now)
-        return sorted(future_rows, key=lambda row: parse_utc_timestamp(row.get("date_start")) or datetime.max.replace(tzinfo=timezone.utc))
+        open_rows = [row for row in rows if self._session_row_is_open_or_future(row, now)]
+        if not open_rows:
+            open_rows = self._future_session_rows_for_meeting(meeting_raw, now)
+        return sorted(open_rows, key=lambda row: parse_utc_timestamp(row.get("date_start")) or datetime.max.replace(tzinfo=timezone.utc))
 
     def _future_session_rows_for_meeting(self, meeting_raw: dict[str, Any], now: datetime) -> list[dict[str, Any]]:
         meeting_key = _optional_int(meeting_raw.get("meeting_key"))
@@ -182,8 +200,20 @@ class DashboardService:
             row
             for row in rows
             if _optional_int(row.get("meeting_key")) == meeting_key
-            and (parse_utc_timestamp(row.get("date_start")) or datetime.min.replace(tzinfo=timezone.utc)) > now
+            and self._session_row_is_open_or_future(row, now)
         ]
+
+    def _session_row_is_open_or_future(self, row: dict[str, Any], now: datetime) -> bool:
+        start = parse_utc_timestamp(row.get("date_start"))
+        end = parse_utc_timestamp(row.get("date_end"))
+        return self._session_is_open_or_future(start, end, now)
+
+    def _session_is_open_or_future(self, start: datetime | None, end: datetime | None, now: datetime) -> bool:
+        if start is None:
+            return False
+        if start > now:
+            return True
+        return end is None or end > now
 
     def _position_rows(self, session_raw: dict[str, Any] | None) -> list[dict[str, Any]]:
         if not session_raw:
@@ -500,11 +530,156 @@ class DashboardService:
             return None
         return sum(durations) / len(durations)
 
+    def _persist_snapshot(self, snapshot: DashboardSnapshot) -> None:
+        if self.snapshot_cache_path is None:
+            return
+        try:
+            self.snapshot_cache_path.parent.mkdir(parents=True, exist_ok=True)
+            self.snapshot_cache_path.write_text(json.dumps(asdict(snapshot), default=_json_default), encoding="utf-8")
+        except OSError:
+            return
+
+    def _load_persisted_snapshot(self) -> DashboardSnapshot | None:
+        if self.snapshot_cache_path is None or not self.snapshot_cache_path.exists():
+            return None
+        try:
+            payload = json.loads(self.snapshot_cache_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, dict):
+            return None
+        try:
+            return _snapshot_from_dict(payload)
+        except (KeyError, TypeError, ValueError):
+            return None
+
 
 def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def _json_default(value: Any) -> str:
+    if isinstance(value, datetime):
+        return _as_utc(value).isoformat().replace("+00:00", "Z")
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
+def _snapshot_from_dict(payload: dict[str, Any]) -> DashboardSnapshot:
+    return DashboardSnapshot(
+        meeting=_meeting_from_dict(payload.get("meeting")),
+        sessions=[_session_from_dict(row) for row in payload.get("sessions", [])],
+        latest_positions=[_position_from_dict(row) for row in payload.get("latest_positions", [])],
+        latest_laps=[_lap_from_dict(row) for row in payload.get("latest_laps", [])],
+        race_control=[_race_control_from_dict(row) for row in payload.get("race_control", [])],
+        latest_results=[_classification_from_dict(row) for row in payload.get("latest_results", [])],
+        driver_standings=[_championship_row_from_dict(row) for row in payload.get("driver_standings", [])],
+        constructor_standings=[_championship_row_from_dict(row) for row in payload.get("constructor_standings", [])],
+        generated_at_utc=parse_utc_timestamp(payload["generated_at_utc"]) or datetime.now(timezone.utc),
+        venue=_venue_from_dict(payload.get("venue")),
+    )
+
+
+def _meeting_from_dict(payload: dict[str, Any] | None) -> Meeting | None:
+    if not payload:
+        return None
+    return Meeting(**payload)
+
+
+def _session_from_dict(payload: dict[str, Any]) -> Session:
+    return Session(
+        session_key=int(payload["session_key"]),
+        meeting_key=int(payload["meeting_key"]),
+        session_name=str(payload["session_name"]),
+        session_type=str(payload["session_type"]),
+        date_start_utc=parse_utc_timestamp(payload["date_start_utc"]) or datetime.now(timezone.utc),
+        date_end_utc=parse_utc_timestamp(payload.get("date_end_utc")),
+    )
+
+
+def _position_from_dict(payload: dict[str, Any]) -> PositionSample:
+    return PositionSample(
+        date_utc=parse_utc_timestamp(payload["date_utc"]) or datetime.now(timezone.utc),
+        session_key=int(payload["session_key"]),
+        meeting_key=int(payload["meeting_key"]),
+        driver_number=int(payload["driver_number"]),
+        position=int(payload["position"]),
+    )
+
+
+def _lap_from_dict(payload: dict[str, Any]) -> LapSample:
+    return LapSample(
+        meeting_key=int(payload["meeting_key"]),
+        session_key=int(payload["session_key"]),
+        driver_number=int(payload["driver_number"]),
+        lap_number=int(payload["lap_number"]),
+        date_start_utc=parse_utc_timestamp(payload.get("date_start_utc")),
+        payload=dict(payload.get("payload", {})),
+    )
+
+
+def _race_control_from_dict(payload: dict[str, Any]) -> RaceControlMessage:
+    return RaceControlMessage(
+        meeting_key=_optional_int(payload.get("meeting_key")),
+        session_key=_optional_int(payload.get("session_key")),
+        date_utc=parse_utc_timestamp(payload["date_utc"]) or datetime.now(timezone.utc),
+        category=payload.get("category"),
+        message=str(payload.get("message", "")),
+    )
+
+
+def _classification_from_dict(payload: dict[str, Any]) -> ClassificationRow:
+    return ClassificationRow(
+        position=_optional_int(payload.get("position")),
+        driver_number=_optional_int(payload.get("driver_number")),
+        driver_name=payload.get("driver_name"),
+        team_name=payload.get("team_name"),
+        points=_optional_float(payload.get("points")),
+        status=payload.get("status"),
+    )
+
+
+def _weather_day_from_dict(payload: dict[str, Any]) -> WeatherForecastDay:
+    return WeatherForecastDay(
+        date=str(payload["date"]),
+        label=str(payload["label"]),
+        summary=str(payload.get("summary", "")),
+        is_wet=bool(payload.get("is_wet", False)),
+        precipitation_probability_max=_optional_int(payload.get("precipitation_probability_max")),
+        precipitation_sum_mm=_optional_float(payload.get("precipitation_sum_mm")),
+        rain_sum_mm=_optional_float(payload.get("rain_sum_mm")),
+        showers_sum_mm=_optional_float(payload.get("showers_sum_mm")),
+        snowfall_sum_mm=_optional_float(payload.get("snowfall_sum_mm")),
+        temperature_max_c=_optional_float(payload.get("temperature_max_c")),
+        temperature_min_c=_optional_float(payload.get("temperature_min_c")),
+    )
+
+
+def _venue_from_dict(payload: dict[str, Any] | None) -> VenueContext | None:
+    if not payload:
+        return None
+    return VenueContext(
+        circuit_name=str(payload.get("circuit_name") or "Track"),
+        circuit_short_name=payload.get("circuit_short_name"),
+        circuit_image_url=payload.get("circuit_image_url"),
+        circuit_wiki_url=payload.get("circuit_wiki_url"),
+        track_map_svg=payload.get("track_map_svg"),
+        track_length_km=_optional_float(payload.get("track_length_km")),
+        fastest_lap_seconds=_optional_float(payload.get("fastest_lap_seconds")),
+        average_pit_stop_seconds=_optional_float(payload.get("average_pit_stop_seconds")),
+        weather_forecast=[_weather_day_from_dict(row) for row in payload.get("weather_forecast", [])],
+    )
+
+
+def _championship_row_from_dict(payload: dict[str, Any]) -> ChampionshipStandingRow:
+    return ChampionshipStandingRow(
+        position=_optional_int(payload.get("position")),
+        competitor_name=str(payload.get("competitor_name") or "Unknown competitor"),
+        points=_float_or_zero(payload.get("points")),
+        wins=_optional_int(payload.get("wins")),
+        gap=payload.get("gap"),
+    )
 
 
 def _jolpica_event_datetime(event: dict[str, Any]) -> datetime | None:

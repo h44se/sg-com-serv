@@ -26,6 +26,13 @@ function renderSessionTime(session: Session, timeZone: string) {
   return formatUtcInTimeZone(session.date_start_utc, timeZone);
 }
 
+function sessionIsOngoing(session: Session, referenceUtcIso: string) {
+  const reference = new Date(referenceUtcIso).getTime();
+  const sessionStart = new Date(session.date_start_utc).getTime();
+  const sessionEnd = session.date_end_utc ? new Date(session.date_end_utc).getTime() : Number.POSITIVE_INFINITY;
+  return sessionStart <= reference && reference < sessionEnd;
+}
+
 function resultTitle(rows: ClassificationRow[]) {
   const status = rows[0]?.status ?? "Latest classification";
   return status.split(" · ")[0];
@@ -135,6 +142,38 @@ function SessionsPanel({ sessions, timeZone }: { sessions: Session[]; timeZone: 
   );
 }
 
+function SessionStatusCard({ session, referenceUtcIso }: { session: Session | null; referenceUtcIso: string }) {
+  if (!session) {
+    return (
+      <section className="countdown-card" aria-label="Session status unavailable">
+        <div className="countdown-header">
+          <div>
+            <p className="eyebrow">Session status</p>
+            <h2 className="panel-title">Weekend session data unavailable</h2>
+          </div>
+        </div>
+        <p className="countdown-value">Waiting for cached or live schedule data</p>
+      </section>
+    );
+  }
+
+  if (sessionIsOngoing(session, referenceUtcIso)) {
+    return (
+      <section className="countdown-card" aria-label="Ongoing session status">
+        <div className="countdown-header">
+          <div>
+            <p className="eyebrow">Ongoing session</p>
+            <h2 className="panel-title">{session.session_name}</h2>
+          </div>
+        </div>
+        <p className="countdown-value">Now live</p>
+      </section>
+    );
+  }
+
+  return <CountdownTimer targetUtcIso={session.date_start_utc} label={session.session_name} />;
+}
+
 function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
   const [pageIndex, setPageIndex] = useState(0);
   const pageCount = buildPages(rows.length, RESULTS_PAGE_SIZE);
@@ -237,7 +276,7 @@ export function DashboardShell({ snapshot, timeZone }: DashboardShellProps) {
 
       <section className="overview-row" aria-label="Next session and circuit">
         <div className="next-session-stack">
-          {nextSession ? <CountdownTimer targetUtcIso={nextSession.date_start_utc} label={nextSession.session_name} /> : null}
+          <SessionStatusCard session={nextSession ?? null} referenceUtcIso={snapshot.generated_at_utc} />
           <SessionsPanel sessions={snapshot.sessions} timeZone={timeZone} />
         </div>
         <div className="venue-grid">
