@@ -157,6 +157,44 @@ class FakeClient:
             },
         ]
 
+    def laps(self, session_key):
+        return [
+            {
+                "meeting_key": 1285,
+                "session_key": session_key,
+                "driver_number": 44,
+                "lap_number": 1,
+                "date_start": None,
+                "lap_duration": 73.25,
+            },
+            {
+                "meeting_key": 1285,
+                "session_key": session_key,
+                "driver_number": 12,
+                "lap_number": 16,
+                "date_start": "2026-05-22T21:33:47.284000+00:00",
+                "lap_duration": 72.965,
+            },
+        ]
+
+    def pit(self, session_key):
+        return [
+            {"meeting_key": 1285, "session_key": session_key, "driver_number": 12, "pit_duration": 349.9},
+            {"meeting_key": 1285, "session_key": session_key, "driver_number": 44, "pit_duration": 349.9},
+            {"meeting_key": 1285, "session_key": session_key, "driver_number": 63, "pit_duration": 349.9},
+        ]
+
+    def race_control(self, session_key):
+        return [
+            {
+                "meeting_key": 1285,
+                "session_key": session_key,
+                "date": "2026-05-22T20:30:00.066000+00:00",
+                "category": "SessionStatus",
+                "message": "SESSION STARTED",
+            }
+        ]
+
 
 class FixtureMidWeekendMonacoClient:
     fixture_dir = FIXTURES_DIR / "2026-monaco-mid-weekend"
@@ -200,44 +238,6 @@ class FixtureMidWeekendMonacoClient:
 
     def race_control(self, session_key):
         return []
-
-    def laps(self, session_key):
-        return [
-            {
-                "meeting_key": 1285,
-                "session_key": session_key,
-                "driver_number": 44,
-                "lap_number": 1,
-                "date_start": None,
-                "lap_duration": 73.25,
-            },
-            {
-                "meeting_key": 1285,
-                "session_key": session_key,
-                "driver_number": 12,
-                "lap_number": 16,
-                "date_start": "2026-05-22T21:33:47.284000+00:00",
-                "lap_duration": 72.965,
-            },
-        ]
-
-    def pit(self, session_key):
-        return [
-            {"meeting_key": 1285, "session_key": session_key, "driver_number": 12, "pit_duration": 349.9},
-            {"meeting_key": 1285, "session_key": session_key, "driver_number": 44, "pit_duration": 349.9},
-            {"meeting_key": 1285, "session_key": session_key, "driver_number": 63, "pit_duration": 349.9},
-        ]
-
-    def race_control(self, session_key):
-        return [
-            {
-                "meeting_key": 1285,
-                "session_key": session_key,
-                "date": "2026-05-22T20:30:00.066000+00:00",
-                "category": "SessionStatus",
-                "message": "SESSION STARTED",
-            }
-        ]
 
 
 class FakeStandingsClient:
