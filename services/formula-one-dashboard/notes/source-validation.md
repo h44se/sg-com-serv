@@ -18,8 +18,11 @@ Confirmed in this environment:
   - `session_results`
   - `championship_drivers`
   - `championship_teams`
+- Captured reusable state:
+  - Monaco mid-weekend on `2026-06-05`: `latest_session` returned completed `Practice 1` while `sessions?meeting_key=1286` still exposed the remaining open weekend schedule. See `docs/openf1-states/2026-06-05-monaco-mid-weekend.md`.
 
 Conclusion:
 
 - The dashboard should treat OpenF1 as a provider for meetings, sessions, live timing, and race-control data.
 - Championship standings and session results need a fallback adapter or a derived/cache-backed path.
+- The dashboard must derive the open weekend schedule from meeting sessions plus the current clock, not from `latest_session` alone.

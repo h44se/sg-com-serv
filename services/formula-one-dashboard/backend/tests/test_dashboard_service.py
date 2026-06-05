@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from json import loads
+from pathlib import Path
 
 import pytest
 
@@ -11,6 +13,9 @@ from f1dashboard.providers.jolpica import JolpicaError
 from f1dashboard.providers.openf1 import OpenF1Error
 from f1dashboard.providers.venue import VenueError
 from f1dashboard.services.dashboard import DashboardService
+
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures" / "openf1"
 
 
 class FakeClient:
@@ -151,6 +156,50 @@ class FakeClient:
                 "team_name": "Ferrari",
             },
         ]
+
+
+class FixtureMidWeekendMonacoClient:
+    fixture_dir = FIXTURES_DIR / "2026-monaco-mid-weekend"
+
+    def _load(self, name: str):
+        return loads((self.fixture_dir / name).read_text(encoding="utf-8"))
+
+    def latest_meeting(self):
+        return self._load("meetings-latest.json")[0]
+
+    def latest_session(self):
+        return self._load("sessions-latest.json")[0]
+
+    def meetings(self, year):
+        if year != 2026:
+            return []
+        return [self.latest_meeting()]
+
+    def sessions(self, meeting_key):
+        if meeting_key != 1286:
+            return []
+        return self._load("sessions-meeting-1286.json")
+
+    def future_sessions(self, since_utc_iso):
+        return self._load("sessions-meeting-1286.json")
+
+    def positions(self, session_key):
+        return []
+
+    def drivers(self, session_key):
+        return []
+
+    def laps(self, session_key):
+        return []
+
+    def stints(self, session_key):
+        return []
+
+    def pit(self, session_key):
+        return []
+
+    def race_control(self, session_key):
+        return []
 
     def laps(self, session_key):
         return [
@@ -400,6 +449,22 @@ def test_dashboard_service_skips_completed_latest_meeting_for_next_session() -> 
     assert snapshot.meeting.country_name == "Monaco"
     assert [session.session_name for session in snapshot.sessions] == ["Practice 1", "Race"]
     assert snapshot.sessions[0].date_start_utc == datetime(2026, 6, 5, 11, 30, tzinfo=timezone.utc)
+
+
+def test_dashboard_service_uses_fixture_mid_weekend_state_to_drop_completed_session() -> None:
+    service = DashboardService(
+        client=FixtureMidWeekendMonacoClient(),
+        standings_client=FakeStandingsClient(),
+        venue_client=FakeVenueClient(),
+        clock=lambda: datetime(2026, 6, 5, 12, 45, tzinfo=timezone.utc),
+    )
+
+    snapshot = service.get_snapshot(refresh=True)
+
+    assert snapshot.meeting is not None
+    assert snapshot.meeting.meeting_name == "Monaco Grand Prix"
+    assert [session.session_name for session in snapshot.sessions] == ["Practice 2", "Practice 3", "Qualifying", "Race"]
+    assert [session.session_key for session in snapshot.sessions] == [11293, 11294, 11295, 11299]
 
 
 class MeetingSessionsRateLimitedClient(FakeClient):

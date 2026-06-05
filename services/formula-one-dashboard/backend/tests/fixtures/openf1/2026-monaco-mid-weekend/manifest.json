@@ -1,0 +1,19 @@
+{
+  "state_slug": "2026-monaco-mid-weekend",
+  "captured_at_utc": "2026-06-05T12:45:00Z",
+  "reference_now_utc": "2026-06-05T12:45:00Z",
+  "meeting_key": 1286,
+  "latest_session_key": 11292,
+  "completed_session_keys": [11292],
+  "open_session_keys": [11293, 11294, 11295, 11299],
+  "source_urls": {
+    "meetings_latest": "https://api.openf1.org/v1/meetings?meeting_key=latest",
+    "sessions_latest": "https://api.openf1.org/v1/sessions?session_key=latest",
+    "sessions_meeting": "https://api.openf1.org/v1/sessions?meeting_key=1286"
+  },
+  "files": {
+    "meetings_latest": "meetings-latest.json",
+    "sessions_latest": "sessions-latest.json",
+    "sessions_meeting": "sessions-meeting-1286.json"
+  }
+}
