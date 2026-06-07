@@ -11,7 +11,6 @@
   --muted-2: #777881;
   --red: #ff1e2d;
   --red-soft: rgba(255, 30, 45, 0.14);
-  --green: #2cff9a;
   --max-width: 1720px;
 }
 
@@ -132,7 +131,6 @@ button, input, select, textarea { font: inherit; }
 
 .meta-pill { padding: 12px 14px; }
 .meta-label,
-.stat-label,
 .table-label {
   display: block;
   font-weight: 850;
@@ -170,22 +168,12 @@ button, input, select, textarea { font: inherit; }
 
 .countdown-header,
 .panel-headline,
-.table-head,
-.item-row {
+.table-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: flex-start;
 }
-
-.live-dot {
-  color: var(--green);
-  font-family: "Geist Mono", ui-monospace, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.live-dot::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; background: currentColor; }
 
 .countdown-value {
   margin: 14px 0 0;
@@ -332,7 +320,6 @@ button, input, select, textarea { font: inherit; }
   align-items: start;
 }
 
-.results-card { min-height: 100%; }
 .rank,
 .pos-cell {
   color: var(--red);
@@ -406,7 +393,7 @@ button, input, select, textarea { font: inherit; }
 .standings-table tbody tr:nth-child(1) td { background: rgba(255, 30, 45, 0.09); }
 .pos-cell { width: 44px; }
 .points-cell,
-.wins-cell { text-align: center; font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.points-cell { text-align: center; font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 .competitor-cell { font-weight: 720; text-align: center; }
 .empty-cell { color: var(--muted-2); text-align: center; }
 
@@ -423,8 +410,6 @@ button, input, select, textarea { font: inherit; }
   .dashboard-page { padding: 12px; }
   .table-head { flex-direction: column; }
   .table-actions { justify-content: flex-start; }
-  .wins-cell,
-  .standings-table th:nth-child(4) { display: none; }
   .weather-day {
     grid-template-columns: 42px minmax(0, 1fr);
   }

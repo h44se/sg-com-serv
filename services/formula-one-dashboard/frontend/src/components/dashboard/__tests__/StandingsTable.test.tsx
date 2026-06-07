@@ -17,7 +17,7 @@ describe("StandingsTable", () => {
   it("shows eleven rows on the first page by default", () => {
     const html = renderToStaticMarkup(createElement(StandingsTable, { title: "Drivers standings", rows: buildRows(20) }));
 
-    expect(html).toContain("Top 11");
+    expect(html).toContain("Championship");
     expect(html).toContain('aria-label="Drivers standings pages"');
     expect(html).toContain("Driver 11");
     expect(html).not.toContain("Driver 12");
@@ -26,13 +26,13 @@ describe("StandingsTable", () => {
   it("does not render pagination when rows fit on one page", () => {
     const html = renderToStaticMarkup(createElement(StandingsTable, { title: "Team standings", rows: buildRows(10) }));
 
-    expect(html).toContain("Top 10");
+    expect(html).toContain("Team standings");
     expect(html).not.toContain("pagination-toggle");
   });
 
   it("accepts empty rows for loading fallback states", () => {
-    const rows: ChampionshipStandingRow[] = [];
-    expect(rows).toHaveLength(0);
-    expect(StandingsTable).toBeDefined();
+    const html = renderToStaticMarkup(createElement(StandingsTable, { title: "Drivers standings", rows: [] } satisfies { title: string; rows: ChampionshipStandingRow[] }));
+
+    expect(html).toContain("No standings available yet.");
   });
 });

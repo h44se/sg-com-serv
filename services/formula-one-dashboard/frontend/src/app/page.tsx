@@ -1,5 +1,8 @@
-import { DashboardPageClient } from "@/components/dashboard/DashboardPageClient";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { fetchDashboardSnapshot } from "@/lib/dashboard-client";
 
-export default function Page() {
-  return <DashboardPageClient />;
+export default async function Page() {
+  const snapshot = await fetchDashboardSnapshot().catch(() => null);
+
+  return <DashboardShell snapshot={snapshot} />;
 }

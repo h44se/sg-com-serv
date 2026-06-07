@@ -98,7 +98,7 @@ const snapshot: DashboardSnapshot = {
 
 describe("DashboardShell weather panel", () => {
   it("renders only Friday to Sunday forecast entries", () => {
-    const html = renderToStaticMarkup(createElement(DashboardShell, { snapshot, timeZone: "UTC" }));
+    const html = renderToStaticMarkup(createElement(DashboardShell, { snapshot }));
 
     expect(html).toContain("Circuit de Monaco");
     expect(html).toContain("Weekend weather");
@@ -119,7 +119,6 @@ describe("DashboardShell weather panel", () => {
           ...snapshot,
           generated_at_utc: "2026-06-05T12:00:00Z",
         },
-        timeZone: "UTC",
       }),
     );
 
@@ -136,7 +135,6 @@ describe("DashboardShell weather panel", () => {
           ...snapshot,
           sessions: [],
         },
-        timeZone: "UTC",
       }),
     );
 

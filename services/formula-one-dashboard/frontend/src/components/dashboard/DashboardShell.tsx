@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import type { ClassificationRow, DashboardSnapshot, Session, VenueContext, WeatherForecastDay } from "@/lib/dashboard-types";
-import { formatUtcInTimeZone } from "@/lib/timezone";
+import { detectBrowserTimeZone, formatUtcInTimeZone } from "@/lib/timezone";
 import { CountdownTimer } from "./CountdownTimer";
 import { StandingsTable } from "./StandingsTable";
 
 export interface DashboardShellProps {
   snapshot: DashboardSnapshot | null;
-  timeZone: string;
 }
 
 const RESULTS_PAGE_SIZE = 11;
@@ -179,9 +179,8 @@ function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
   const pageCount = buildPages(rows.length, RESULTS_PAGE_SIZE);
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
   const startIndex = safePageIndex * RESULTS_PAGE_SIZE;
-  const visibleRows = useMemo(() => rows.slice(startIndex, startIndex + RESULTS_PAGE_SIZE), [rows, startIndex]);
+  const visibleRows = rows.slice(startIndex, startIndex + RESULTS_PAGE_SIZE);
   const canPaginate = rows.length > RESULTS_PAGE_SIZE;
-  const topCount = Math.min(rows.length, RESULTS_PAGE_SIZE);
 
   return (
     <section className="table-card">
@@ -238,7 +237,13 @@ function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
   );
 }
 
-export function DashboardShell({ snapshot, timeZone }: DashboardShellProps) {
+export function DashboardShell({ snapshot }: DashboardShellProps) {
+  const [timeZone, setTimeZone] = useState("UTC");
+
+  useEffect(() => {
+    setTimeZone(detectBrowserTimeZone());
+  }, []);
+
   if (!snapshot) {
     return (
       <main className="loading-shell">

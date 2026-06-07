@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import type { ChampionshipStandingRow } from "@/lib/dashboard-types";
 
 export interface StandingsTableProps {
@@ -18,7 +19,7 @@ export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTablePro
   const pageCount = buildPages(rows.length, pageSize);
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
   const startIndex = safePageIndex * pageSize;
-  const visibleRows = useMemo(() => rows.slice(startIndex, startIndex + pageSize), [pageSize, rows, startIndex]);
+  const visibleRows = rows.slice(startIndex, startIndex + pageSize);
   const canPaginate = rows.length > pageSize;
 
   return (
