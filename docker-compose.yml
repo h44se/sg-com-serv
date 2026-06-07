@@ -251,8 +251,3 @@ services:
 networks:
   server_net:
     driver: bridge
-
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
