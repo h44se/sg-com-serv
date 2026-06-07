@@ -18,7 +18,9 @@ export async function GET() {
       status: response.status,
       headers: {
         "cache-control": "no-store",
-        "content-type": response.headers.get("content-type") ?? "application/json; charset=utf-8",
+        "content-type":
+          response.headers.get("content-type") ??
+          "application/json; charset=utf-8",
       },
     });
   } catch {

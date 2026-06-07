@@ -1,8 +1,13 @@
 "use client";
 
-import React from "react";
-import { useEffect, useState } from "react";
-import type { ClassificationRow, DashboardSnapshot, Session, VenueContext, WeatherForecastDay } from "@/lib/dashboard-types";
+import { useState, useSyncExternalStore } from "react";
+import type {
+  ClassificationRow,
+  DashboardSnapshot,
+  Session,
+  VenueContext,
+  WeatherForecastDay,
+} from "@/lib/dashboard-types";
 import { detectBrowserTimeZone, formatUtcInTimeZone } from "@/lib/timezone";
 import { CountdownTimer } from "./CountdownTimer";
 import { StandingsTable } from "./StandingsTable";
@@ -13,13 +18,24 @@ export interface DashboardShellProps {
 
 const RESULTS_PAGE_SIZE = 11;
 const STANDINGS_PAGE_SIZE = 11;
+const SERVER_TIME_ZONE = "UTC";
+
+function subscribeToTimeZone() {
+  return () => {};
+}
 
 function formatMeeting(snapshot: DashboardSnapshot) {
   if (!snapshot.meeting) {
     return "Current Formula 1 season";
   }
 
-  return [snapshot.meeting.meeting_name, snapshot.meeting.location, snapshot.meeting.country_name].filter(Boolean).join(" · ");
+  return [
+    snapshot.meeting.meeting_name,
+    snapshot.meeting.location,
+    snapshot.meeting.country_name,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function renderSessionTime(session: Session, timeZone: string) {
@@ -29,7 +45,9 @@ function renderSessionTime(session: Session, timeZone: string) {
 function sessionIsOngoing(session: Session, referenceUtcIso: string) {
   const reference = new Date(referenceUtcIso).getTime();
   const sessionStart = new Date(session.date_start_utc).getTime();
-  const sessionEnd = session.date_end_utc ? new Date(session.date_end_utc).getTime() : Number.POSITIVE_INFINITY;
+  const sessionEnd = session.date_end_utc
+    ? new Date(session.date_end_utc).getTime()
+    : Number.POSITIVE_INFINITY;
   return sessionStart <= reference && reference < sessionEnd;
 }
 
@@ -66,7 +84,9 @@ function formatTemperatureRange(day: WeatherForecastDay) {
 }
 
 function selectWeekendWeatherDays(days: WeatherForecastDay[]) {
-  return WEATHER_DAY_LABELS.map((label) => days.find((day) => day.label === label)).filter((day): day is WeatherForecastDay => Boolean(day));
+  return WEATHER_DAY_LABELS.map((label) =>
+    days.find((day) => day.label === label),
+  ).filter((day): day is WeatherForecastDay => Boolean(day));
 }
 
 function TrackMapPanel({ venue }: { venue: VenueContext | null }) {
@@ -79,7 +99,11 @@ function TrackMapPanel({ venue }: { venue: VenueContext | null }) {
         <h2 className="panel-title">{circuitName}</h2>
       </div>
       <div className="venue-map" aria-label="Circuit map">
-        {venue?.track_map_svg ? <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} /> : <span>Track map unavailable</span>}
+        {venue?.track_map_svg ? (
+          <div dangerouslySetInnerHTML={{ __html: venue.track_map_svg }} />
+        ) : (
+          <span>Track map unavailable</span>
+        )}
       </div>
     </article>
   );
@@ -89,7 +113,10 @@ function WeatherPanel({ venue }: { venue: VenueContext | null }) {
   const weatherDays = selectWeekendWeatherDays(venue?.weather_forecast ?? []);
 
   return (
-    <article className="panel venue-panel weather-tile" aria-label="Weekend weather">
+    <article
+      className="panel venue-panel weather-tile"
+      aria-label="Weekend weather"
+    >
       <div className="weather-header">
         <div>
           <p className="eyebrow">Weather</p>
@@ -98,13 +125,23 @@ function WeatherPanel({ venue }: { venue: VenueContext | null }) {
       </div>
       <div className="weather-list">
         {weatherDays.length === 0 ? (
-          <div className="weather-day empty-cell">No Friday to Sunday forecast available.</div>
+          <div className="weather-day empty-cell">
+            No Friday to Sunday forecast available.
+          </div>
         ) : (
           weatherDays.map((day) => (
-            <article className={`weather-day${day.is_wet ? " is-wet" : ""}`} key={day.date}>
+            <article
+              className={`weather-day${day.is_wet ? " is-wet" : ""}`}
+              key={day.date}
+            >
               <span className="weather-label">{day.label}</span>
               <p className="weather-temp">{formatTemperatureRange(day)}</p>
-              <p className="weather-meta">Rain {day.precipitation_probability_max != null ? `${day.precipitation_probability_max}%` : "n/a"}</p>
+              <p className="weather-meta">
+                Rain{" "}
+                {day.precipitation_probability_max != null
+                  ? `${day.precipitation_probability_max}%`
+                  : "n/a"}
+              </p>
             </article>
           ))
         )}
@@ -113,7 +150,13 @@ function WeatherPanel({ venue }: { venue: VenueContext | null }) {
   );
 }
 
-function SessionsPanel({ sessions, timeZone }: { sessions: Session[]; timeZone: string }) {
+function SessionsPanel({
+  sessions,
+  timeZone,
+}: {
+  sessions: Session[];
+  timeZone: string;
+}) {
   const openSessions = sessions.slice(0, 6);
 
   return (
@@ -127,12 +170,17 @@ function SessionsPanel({ sessions, timeZone }: { sessions: Session[]; timeZone: 
       </div>
       <div className="session-list">
         {openSessions.length === 0 ? (
-          <div className="session-row empty-cell">No upcoming sessions found.</div>
+          <div className="session-row empty-cell">
+            No upcoming sessions found.
+          </div>
         ) : (
           openSessions.map((session, index) => (
-            <div className={`session-row${index === 0 ? " is-next" : ""}`} key={session.session_key}>
+            <div
+              className={`session-row${index === 0 ? " is-next" : ""}`}
+              key={session.session_key}
+            >
               <span className="rank">{session.session_type}</span>
-              
+
               <span>{renderSessionTime(session, timeZone)}</span>
             </div>
           ))
@@ -142,17 +190,28 @@ function SessionsPanel({ sessions, timeZone }: { sessions: Session[]; timeZone: 
   );
 }
 
-function SessionStatusCard({ session, referenceUtcIso }: { session: Session | null; referenceUtcIso: string }) {
+function SessionStatusCard({
+  session,
+  referenceUtcIso,
+}: {
+  session: Session | null;
+  referenceUtcIso: string;
+}) {
   if (!session) {
     return (
-      <section className="countdown-card" aria-label="Session status unavailable">
+      <section
+        className="countdown-card"
+        aria-label="Session status unavailable"
+      >
         <div className="countdown-header">
           <div>
             <p className="eyebrow">Session status</p>
             <h2 className="panel-title">Weekend session data unavailable</h2>
           </div>
         </div>
-        <p className="countdown-value">Waiting for cached or live schedule data</p>
+        <p className="countdown-value">
+          Waiting for cached or live schedule data
+        </p>
       </section>
     );
   }
@@ -171,7 +230,12 @@ function SessionStatusCard({ session, referenceUtcIso }: { session: Session | nu
     );
   }
 
-  return <CountdownTimer targetUtcIso={session.date_start_utc} label={session.session_name} />;
+  return (
+    <CountdownTimer
+      targetUtcIso={session.date_start_utc}
+      label={session.session_name}
+    />
+  );
 }
 
 function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
@@ -224,9 +288,14 @@ function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
             </tr>
           ) : (
             visibleRows.map((result, index) => (
-              <tr key={`${result.driver_number ?? index}-${result.position ?? "na"}`}>
+              <tr
+                key={`${result.driver_number ?? index}-${result.position ?? "na"}`}
+              >
                 <td className="pos-cell">{result.position ?? "—"}</td>
-                <td className="competitor-cell">{result.driver_name ?? `Driver ${result.driver_number ?? "—"}`}</td>
+                <td className="competitor-cell">
+                  {result.driver_name ??
+                    `Driver ${result.driver_number ?? "—"}`}
+                </td>
                 <td className="result-meta-cell">{resultMeta(result)}</td>
               </tr>
             ))
@@ -238,11 +307,11 @@ function ResultPanel({ rows }: { rows: ClassificationRow[] }) {
 }
 
 export function DashboardShell({ snapshot }: DashboardShellProps) {
-  const [timeZone, setTimeZone] = useState("UTC");
-
-  useEffect(() => {
-    setTimeZone(detectBrowserTimeZone());
-  }, []);
+  const timeZone = useSyncExternalStore(
+    subscribeToTimeZone,
+    detectBrowserTimeZone,
+    () => SERVER_TIME_ZONE,
+  );
 
   if (!snapshot) {
     return (
@@ -251,7 +320,10 @@ export function DashboardShell({ snapshot }: DashboardShellProps) {
           <div className="loading-bar" />
           <p className="kicker">Formula One Dashboard</p>
           <h1 className="panel-title">Loading dashboard…</h1>
-          <p className="panel-copy">Next session, venue, latest result and standings are being synchronized.</p>
+          <p className="panel-copy">
+            Next session, venue, latest result and standings are being
+            synchronized.
+          </p>
         </section>
       </main>
     );
@@ -274,14 +346,19 @@ export function DashboardShell({ snapshot }: DashboardShellProps) {
           </div>
           <div className="meta-pill">
             <span className="meta-label">Updated</span>
-            <span className="meta-value">{formatUtcInTimeZone(snapshot.generated_at_utc, timeZone)}</span>
+            <span className="meta-value">
+              {formatUtcInTimeZone(snapshot.generated_at_utc, timeZone)}
+            </span>
           </div>
         </div>
       </header>
 
       <section className="overview-row" aria-label="Next session and circuit">
         <div className="next-session-stack">
-          <SessionStatusCard session={nextSession ?? null} referenceUtcIso={snapshot.generated_at_utc} />
+          <SessionStatusCard
+            session={nextSession ?? null}
+            referenceUtcIso={snapshot.generated_at_utc}
+          />
           <SessionsPanel sessions={snapshot.sessions} timeZone={timeZone} />
         </div>
         <div className="venue-grid">
@@ -290,10 +367,21 @@ export function DashboardShell({ snapshot }: DashboardShellProps) {
         </div>
       </section>
 
-      <section className="data-row" aria-label="Latest result and championship standings">
+      <section
+        className="data-row"
+        aria-label="Latest result and championship standings"
+      >
         <ResultPanel rows={snapshot.latest_results} />
-        <StandingsTable title="Driver standings" rows={snapshot.driver_standings} pageSize={STANDINGS_PAGE_SIZE} />
-        <StandingsTable title="Team standings" rows={snapshot.constructor_standings} pageSize={STANDINGS_PAGE_SIZE} />
+        <StandingsTable
+          title="Driver standings"
+          rows={snapshot.driver_standings}
+          pageSize={STANDINGS_PAGE_SIZE}
+        />
+        <StandingsTable
+          title="Team standings"
+          rows={snapshot.constructor_standings}
+          pageSize={STANDINGS_PAGE_SIZE}
+        />
       </section>
     </main>
   );

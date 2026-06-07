@@ -14,7 +14,9 @@ function resolveDashboardUrl(baseUrl = "") {
   return "/api/dashboard";
 }
 
-export async function fetchDashboardSnapshot(baseUrl = ""): Promise<DashboardSnapshot> {
+export async function fetchDashboardSnapshot(
+  baseUrl = "",
+): Promise<DashboardSnapshot> {
   const response = await fetch(resolveDashboardUrl(baseUrl), {
     headers: {
       Accept: "application/json",

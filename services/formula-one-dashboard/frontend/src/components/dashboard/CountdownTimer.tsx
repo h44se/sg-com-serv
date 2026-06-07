@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useEffect, useState } from "react";
 import { formatCountdown } from "@/lib/timezone";
 
@@ -9,7 +8,10 @@ export interface CountdownTimerProps {
   label?: string;
 }
 
-export function CountdownTimer({ targetUtcIso, label = "Countdown" }: CountdownTimerProps) {
+export function CountdownTimer({
+  targetUtcIso,
+  label = "Countdown",
+}: CountdownTimerProps) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {

@@ -16,7 +16,10 @@ export function formatUtcInTimeZone(
   }).format(date);
 }
 
-export function formatCountdown(targetUtcIso: string, now: Date = new Date()): string {
+export function formatCountdown(
+  targetUtcIso: string,
+  now: Date = new Date(),
+): string {
   const target = new Date(targetUtcIso).getTime();
   const diff = Math.max(0, target - now.getTime());
   const totalSeconds = Math.floor(diff / 1000);

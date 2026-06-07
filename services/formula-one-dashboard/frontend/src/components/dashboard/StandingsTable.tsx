@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useState } from "react";
 import type { ChampionshipStandingRow } from "@/lib/dashboard-types";
 
@@ -14,7 +13,11 @@ function buildPages(rowCount: number, pageSize: number) {
   return Math.max(Math.ceil(rowCount / pageSize), 1);
 }
 
-export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTableProps) {
+export function StandingsTable({
+  title,
+  rows,
+  pageSize = 11,
+}: StandingsTableProps) {
   const [pageIndex, setPageIndex] = useState(0);
   const pageCount = buildPages(rows.length, pageSize);
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
@@ -58,7 +61,7 @@ export function StandingsTable({ title, rows, pageSize = 11 }: StandingsTablePro
         <tbody>
           {visibleRows.length === 0 ? (
             <tr>
-              <td className="empty-cell" colSpan={4}>
+              <td className="empty-cell" colSpan={3}>
                 No standings available yet.
               </td>
             </tr>

@@ -98,7 +98,9 @@ const snapshot: DashboardSnapshot = {
 
 describe("DashboardShell weather panel", () => {
   it("renders only Friday to Sunday forecast entries", () => {
-    const html = renderToStaticMarkup(createElement(DashboardShell, { snapshot }));
+    const html = renderToStaticMarkup(
+      createElement(DashboardShell, { snapshot }),
+    );
 
     expect(html).toContain("Circuit de Monaco");
     expect(html).toContain("Weekend weather");
