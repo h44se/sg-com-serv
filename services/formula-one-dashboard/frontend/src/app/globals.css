@@ -233,6 +233,67 @@ textarea {
   line-height: 0.86;
 }
 
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.countdown-field {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  padding: 14px 12px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    rgba(6, 7, 10, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -18px 32px rgba(0, 0, 0, 0.18);
+  justify-items: center;
+  text-align: center;
+}
+
+.countdown-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), rgba(255, 30, 45, 0.2));
+}
+
+.countdown-number {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(1.45rem, 2.6vw, 2.3rem);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.03);
+}
+
+.countdown-unit {
+  color: #c4c4cb;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.countdown-field:last-child {
+  border-color: rgba(255, 30, 45, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 30, 45, 0.08), rgba(255, 255, 255, 0.015)),
+    rgba(6, 7, 10, 0.82);
+}
+
 .panel-title {
   margin: 6px 0 0;
   font-size: clamp(1.1rem, 1.55vw, 1.7rem);
@@ -508,6 +569,18 @@ textarea {
 @media (max-width: 640px) {
   .dashboard-page {
     padding: 12px;
+  }
+  .countdown-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .countdown-field {
+    min-height: 84px;
+    padding: 12px 10px 10px;
+  }
+  .countdown-number {
+    font-size: clamp(1.4rem, 6.8vw, 2rem);
   }
   .table-head {
     flex-direction: column;

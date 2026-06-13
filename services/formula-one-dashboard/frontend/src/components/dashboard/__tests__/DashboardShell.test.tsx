@@ -130,6 +130,23 @@ describe("DashboardShell weather panel", () => {
     expect(html).not.toContain("Countdown to next session");
   });
 
+  it("renders the countdown as fixed time fields", () => {
+    const html = renderToStaticMarkup(
+      createElement(DashboardShell, {
+        snapshot,
+      }),
+    );
+
+    expect(html).toContain("Countdown to next session");
+    expect(html).toContain("TAGE");
+    expect(html).toContain("STD");
+    expect(html).toContain("MIN");
+    expect(html).toContain("SEK");
+    expect(html).toContain("Weekend");
+    expect(html).not.toContain("Race Weekend");
+    expect(html).not.toContain("Formula One Dashboard");
+  });
+
   it("renders a fallback session card when schedule data is unavailable", () => {
     const html = renderToStaticMarkup(
       createElement(DashboardShell, {

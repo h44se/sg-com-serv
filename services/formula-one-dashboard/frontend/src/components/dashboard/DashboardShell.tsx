@@ -335,8 +335,7 @@ export function DashboardShell({ snapshot }: DashboardShellProps) {
     <main className="dashboard-page single-screen">
       <header className="hero compact-hero">
         <div>
-          <p className="kicker">Formula One Dashboard</p>
-          <h1>Race Weekend</h1>
+          <h1>Weekend</h1>
           <p className="hero-copy">{formatMeeting(snapshot)}</p>
         </div>
         <div className="hero-meta" aria-label="Dashboard metadata">
